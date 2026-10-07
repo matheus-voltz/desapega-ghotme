@@ -2,6 +2,11 @@
     <div class="auth-kicker">Primeiro acesso</div>
     <h1>Crie sua conta.</h1>
     <p class="auth-subtitle">Escolha como você vai usar o Desapega.ghotme.</p>
+    @if(session('error'))<div class="alert alert-danger small">{{ session('error') }}</div>@endif
+    @if(filled(config('services.google.client_id')))
+        <a class="btn btn-outline-secondary w-100 py-2 mt-3" href="{{ route('google.redirect') }}">Continuar com Google</a>
+        <div class="d-flex align-items-center gap-2 my-4 text-secondary small"><span class="flex-grow-1 border-top"></span><span>ou cadastre com e-mail</span><span class="flex-grow-1 border-top"></span></div>
+    @endif
     <form method="POST" action="{{ route('register') }}" class="mt-4">
         @csrf
         <div class="mb-3"><label for="name" class="form-label">Seu nome</label><input id="name" class="form-control" type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="name">@error('name')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror</div>

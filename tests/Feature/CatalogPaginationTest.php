@@ -1,0 +1,64 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Product;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class CatalogPaginationTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_catalog_shows_twelve_items_then_offers_to_load_more(): void
+    {
+        $this->createProducts(13);
+
+        $response = $this->get(route('catalog.index'));
+
+        $response->assertSee('13 item(ns)')
+            ->assertSee('Produto de teste 13')
+            ->assertDontSee('Produto de teste 01')
+            ->assertSee('Carregar mais itens');
+    }
+
+    public function test_catalog_returns_the_next_page_as_product_cards_for_load_more(): void
+    {
+        $this->createProducts(13);
+
+        $response = $this->get(route('catalog.index', ['page' => 2, 'load_more' => 1]));
+
+        $response->assertOk()
+            ->assertJsonPath('next_page_url', null)
+            ->assertJsonStructure(['html', 'next_page_url']);
+
+        $this->assertStringContainsString('Produto de teste 01', (string) $response->json('html'));
+    }
+
+    public function test_catalog_keeps_the_category_filter_when_loading_more(): void
+    {
+        $this->createProducts(13, 'Livros');
+
+        $response = $this->get(route('catalog.index', ['category' => 'Livros']));
+        $nextPageUrl = (string) $response->viewData('products')->nextPageUrl();
+        parse_str((string) parse_url($nextPageUrl, PHP_URL_QUERY), $query);
+
+        $this->assertSame('Livros', $query['category']);
+        $this->assertSame('2', $query['page']);
+    }
+
+    private function createProducts(int $count, string $category = 'Eletrônicos'): void
+    {
+        foreach (range(1, $count) as $number) {
+            $suffix = str_pad((string) $number, 2, '0', STR_PAD_LEFT);
+
+            Product::create([
+                'name' => "Produto de teste {$suffix}",
+                'slug' => "produto-de-teste-{$suffix}",
+                'category' => $category,
+                'pix_price' => 100,
+                'status' => 'available',
+            ]);
+        }
+    }
+}

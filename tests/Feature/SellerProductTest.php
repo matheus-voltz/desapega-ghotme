@@ -40,4 +40,23 @@ class SellerProductTest extends TestCase
             ->get(route('seller.products.edit', $otherProduct))
             ->assertNotFound();
     }
+
+    public function test_seller_can_update_their_own_item(): void
+    {
+        $seller = User::factory()->create(['account_type' => 'seller']);
+        $product = Product::factory()->for($seller, 'seller')->create();
+
+        $this->actingAs($seller)
+            ->put(route('seller.products.update', $product), [
+                'name' => 'Título revisado',
+                'pix_price' => 299,
+            ])
+            ->assertRedirect(route('seller.products.index'));
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'name' => 'Título revisado',
+            'seller_id' => $seller->id,
+        ]);
+    }
 }

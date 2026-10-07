@@ -63,7 +63,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 });
 
 Route::middleware(['auth', 'seller'])->prefix('vendedor')->name('seller.')->group(function () {
-    Route::resource('itens', SellerProductController::class)->names('products')->except('show');
+    Route::resource('itens', SellerProductController::class)
+        ->parameters(['itens' => 'product'])
+        ->names('products')
+        ->except('show');
     Route::get('/configuracoes', [SettingsController::class, 'edit'])->name('settings.edit');
     Route::put('/configuracoes', [SettingsController::class, 'update'])->name('settings.update');
 });

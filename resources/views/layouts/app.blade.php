@@ -14,7 +14,7 @@
 <body>
     <header class="site-header">
         <div class="container d-flex align-items-center justify-content-between py-3">
-            <a class="brand" href="{{ route('catalog.index') }}"><span class="brand-mark">D</span><span>Desapega<span class="brand-muted">.ghotme</span></span></a>
+            <a class="brand" href="{{ route('landing') }}"><span class="brand-mark">D</span><span>Desapega<span class="brand-muted">.ghotme</span></span></a>
             <nav class="d-flex align-items-center gap-2">
                 <a class="nav-link-custom d-none d-sm-inline" href="{{ route('catalog.index') }}#catalogo">Catálogo</a>
                 @auth

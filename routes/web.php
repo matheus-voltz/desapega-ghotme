@@ -21,7 +21,8 @@ Route::get('/dashboard', function (Request $request): RedirectResponse {
     ->middleware('auth')
     ->name('dashboard');
 
-Route::get('/', [CatalogController::class, 'index'])->name('catalog.index');
+Route::view('/', 'landing')->name('landing');
+Route::get('/catalogo', [CatalogController::class, 'index'])->name('catalog.index');
 Route::get('/produto/{product:slug}', [CatalogController::class, 'product'])->name('catalog.product');
 Route::get('/combo/{bundle:slug}', [CatalogController::class, 'bundle'])->name('catalog.bundle');
 Route::get('/comprar/produto/{product:slug}/pix', [PurchaseClickController::class, 'productPix'])->name('purchase.product.pix');

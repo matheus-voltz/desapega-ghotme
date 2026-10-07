@@ -14,7 +14,7 @@
 <body class="auth-page">
     <div class="auth-orb auth-orb-one"></div><div class="auth-orb auth-orb-two"></div>
     <main class="auth-shell">
-        <a href="{{ route('catalog.index') }}" class="brand auth-brand"><span class="brand-mark">D</span><span>Desapega<span class="brand-muted">.ghotme</span></span></a>
+        <a href="{{ route('landing') }}" class="brand auth-brand"><span class="brand-mark">D</span><span>Desapega<span class="brand-muted">.ghotme</span></span></a>
         <section class="auth-card">
             {{ $slot }}
         </section>

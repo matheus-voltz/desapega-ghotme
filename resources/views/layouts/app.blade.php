@@ -17,17 +17,13 @@
             <a class="brand" href="{{ route('landing') }}"><span class="brand-mark">D</span><span>Desapega<span class="brand-muted">.ghotme</span></span></a>
             <nav class="site-nav">
                 <div class="site-nav-desktop d-flex align-items-center gap-2">
-                    @if(request()->routeIs('landing'))
-                        <a class="nav-link-custom" href="{{ route('login') }}">Entrar na conta</a>
-                    @else
-                        <a class="nav-link-custom" href="{{ route('catalog.index') }}#catalogo">Catálogo</a>
-                    @endif
                     @auth
+                        @unless(request()->routeIs('landing'))<a class="nav-link-custom" href="{{ route('catalog.index') }}#catalogo">Catálogo</a>@endunless
                         <a class="btn btn-sm btn-outline-violet" href="{{ route('cart.index') }}">Minha sacola</a>
                         @if(auth()->user()->isAdmin())<a class="nav-link-custom" href="{{ route('admin.products.index') }}">Meu painel</a>@elseif(auth()->user()->isSeller())<a class="nav-link-custom" href="{{ route('seller.products.index') }}">Painel do vendedor</a>@endif
                         <form method="POST" action="{{ route('logout') }}">@csrf<button class="btn btn-sm btn-link text-secondary text-decoration-none" type="submit">Sair</button></form>
                     @else
-                        <a class="btn btn-sm btn-outline-violet" href="{{ route('login') }}">Entrar</a>
+                        <a class="btn btn-sm btn-outline-violet" href="{{ route('login') }}">Entrar na conta</a>
                     @endauth
                 </div>
                 <details class="site-nav-mobile">

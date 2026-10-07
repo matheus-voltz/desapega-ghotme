@@ -17,7 +17,8 @@ class SellerProfileController extends Controller
             ->with('seller:id,name,public_slug')
             ->orderBy('sort_order')
             ->orderByDesc('id')
-            ->paginate(12);
+            ->paginate(12)
+            ->fragment('itens');
 
         $bundles = $seller->bundles()
             ->with('products')

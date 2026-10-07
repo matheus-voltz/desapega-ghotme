@@ -19,7 +19,7 @@
                 <div class="site-nav-desktop d-flex align-items-center gap-2">
                     @auth
                         @unless(request()->routeIs('landing'))<a class="nav-link-custom" href="{{ route('catalog.index') }}#catalogo">Catálogo</a>@endunless
-                        <a class="btn btn-sm btn-outline-violet" href="{{ route('cart.index') }}">Minha sacola</a>
+                        @if(! auth()->user()->isAdmin() && ! auth()->user()->isSeller())<a class="btn btn-sm btn-outline-violet" href="{{ route('cart.index') }}">Minha sacola</a>@endif
                         @if(auth()->user()->isAdmin())<a class="nav-link-custom" href="{{ route('admin.products.index') }}">Meu painel</a>@elseif(auth()->user()->isSeller())<a class="nav-link-custom" href="{{ route('seller.products.index') }}">Painel do vendedor</a>@endif
                         <form method="POST" action="{{ route('logout') }}">@csrf<button class="btn btn-sm btn-link text-secondary text-decoration-none" type="submit">Sair</button></form>
                     @else
@@ -31,7 +31,7 @@
                     <div class="site-nav-menu">
                         @auth
                             @unless(request()->routeIs('landing'))<a href="{{ route('catalog.index') }}#catalogo">Catálogo</a>@endunless
-                            <a href="{{ route('cart.index') }}">Minha sacola</a>
+                            @if(! auth()->user()->isAdmin() && ! auth()->user()->isSeller())<a href="{{ route('cart.index') }}">Minha sacola</a>@endif
                             @if(auth()->user()->isAdmin())<a href="{{ route('admin.products.index') }}">Meu painel</a>@elseif(auth()->user()->isSeller())<a href="{{ route('seller.products.index') }}">Painel do vendedor</a><a href="{{ route('seller.settings.edit') }}">Configurações</a>@endif
                             <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit">Sair</button></form>
                         @else

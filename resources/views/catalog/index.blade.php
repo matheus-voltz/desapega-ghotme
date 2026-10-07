@@ -15,6 +15,10 @@
 </section>
 
 <div class="container py-5" id="catalogo">
+    <form method="GET" action="{{ route('catalog.index') }}" class="catalog-search card border-0 shadow-sm rounded-4 p-3 p-md-4 mb-4">
+        <div class="row g-2 align-items-end"><div class="col-md-6"><label class="form-label" for="search">Buscar item</label><input id="search" class="form-control" name="search" value="{{ request('search') }}" placeholder="Ex.: livros, iPad, decoração..."></div><div class="col-md-3"><label class="form-label" for="category_filter">Categoria</label><select id="category_filter" class="form-select" name="category"><option value="">Todas</option>@foreach($categories as $category)<option value="{{ $category }}" @selected(request('category') === $category)>{{ $category }}</option>@endforeach</select></div><div class="col-md-2"><label class="form-label" for="max_price">Até R$</label><input id="max_price" class="form-control" name="max_price" inputmode="decimal" value="{{ request('max_price') }}" placeholder="Preço"></div><div class="col-md-1 d-grid"><button class="btn btn-violet">Buscar</button></div></div>
+        @if(request()->filled('search') || request()->filled('category') || request()->filled('max_price'))<div class="mt-3"><a class="small fw-bold" href="{{ route('catalog.index') }}">Limpar filtros</a></div>@endif
+    </form>
     @if($categories->isNotEmpty())
         <div class="mb-5"><div class="eyebrow mb-2">Explore por categoria</div><div class="filter-pills"><a href="{{ route('catalog.index') }}" class="filter-pill {{ request('category') ? '' : 'active' }}">Tudo</a>@foreach($categories as $category)<a href="{{ route('catalog.index', ['category' => $category]) }}" class="filter-pill {{ request('category') === $category ? 'active' : '' }}">{{ $category }}</a>@endforeach</div></div>
     @endif
@@ -26,11 +30,11 @@
     <section>
         <div class="d-flex align-items-end justify-content-between mb-4">
             <div><div class="eyebrow">Disponíveis agora</div><h2 class="section-heading mb-0">Itens à venda</h2></div>
-            <span class="small text-secondary d-none d-sm-inline">{{ $products->total() }} item(ns)</span>
+            <span class="small text-secondary d-none d-sm-inline">{{ $products->total() }} item(ns) encontrados</span>
         </div>
 
         @if($products->isEmpty())
-            <div class="text-center py-5 px-3 rounded-4" style="background:#f7f3ff"><div class="fs-2 mb-2">✦</div><h3 class="h5">Em breve, novos itens.</h3><p class="text-secondary mb-0">Os itens aparecerão aqui assim que forem cadastrados.</p></div>
+            <div class="text-center py-5 px-3 rounded-4" style="background:#f7f3ff"><div class="fs-2 mb-2">✦</div><h3 class="h5">Nenhum item encontrado.</h3><p class="text-secondary mb-0">Tente ajustar a busca ou remover os filtros.</p></div>
         @else
             <div class="row g-3 g-lg-4" id="product-grid">
                 @include('catalog._product-cards', ['products' => $products])

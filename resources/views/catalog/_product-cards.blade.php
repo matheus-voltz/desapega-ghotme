@@ -12,6 +12,9 @@
                     <span class="status status-{{ $product->status }}">{{ $product->status_label }}</span>
                 </div>
                 <h3 class="card-title fw-bold mb-1">{{ $product->name }}</h3>
+                @if($product->seller)
+                    <a class="small text-secondary d-inline-block mb-1" href="{{ route('seller.profile', $product->seller) }}">Por {{ $product->seller->name }}</a>
+                @endif
                 @if($product->condition)
                     <p class="small text-secondary mb-0">{{ $product->condition }}</p>
                 @endif

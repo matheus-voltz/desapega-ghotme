@@ -12,10 +12,28 @@ class CatalogController extends Controller
 {
     public function index(Request $request): View|JsonResponse
     {
-        $query = Product::query()->orderBy('sort_order')->orderByDesc('id');
+        $query = Product::query()
+            ->where('status', 'available')
+            ->with('seller:id,name,public_slug')
+            ->orderBy('sort_order')
+            ->orderByDesc('id');
+
+        if ($request->filled('search')) {
+            $search = trim($request->string('search')->toString());
+            $query->where(function ($productQuery) use ($search): void {
+                $productQuery
+                    ->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('category', 'like', "%{$search}%");
+            });
+        }
 
         if ($request->filled('category')) {
             $query->where('category', $request->string('category'));
+        }
+
+        if ($request->filled('max_price') && is_numeric($request->input('max_price'))) {
+            $query->where('pix_price', '<=', $request->input('max_price'));
         }
 
         $products = $query->paginate(12)->withQueryString();

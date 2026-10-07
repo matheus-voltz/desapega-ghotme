@@ -28,6 +28,7 @@
                 @if($product->category)<span class="small text-secondary">{{ $product->category }}</span>@endif
             </div>
             <h1 class="display-6 fw-bold">{{ $product->name }}</h1>
+            <button type="button" class="btn btn-sm btn-outline-violet mb-3" data-share-product>↗ Compartilhar item</button>
             @if($product->condition)<div class="text-secondary mb-3">Estado: {{ $product->condition }}</div>@endif
             @if($product->description)<p class="detail-description">{!! nl2br(e($product->description)) !!}</p>@endif
 
@@ -81,6 +82,20 @@
             productMainImage.src = button.dataset.productImage;
             document.querySelectorAll('[data-product-image]').forEach((item) => item.classList.toggle('is-active', item === button));
         });
+    });
+
+    document.querySelector('[data-share-product]')?.addEventListener('click', async (event) => {
+        const shareData = { title: @json($product->name), text: 'Confira este item no Desapega.ghotme', url: window.location.href };
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                await navigator.clipboard.writeText(window.location.href);
+                event.currentTarget.textContent = 'Link copiado';
+            }
+        } catch (_) {
+            // O usuário pode fechar a janela nativa de compartilhamento sem concluir.
+        }
     });
 </script>
 @endpush

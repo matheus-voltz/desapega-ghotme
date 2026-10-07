@@ -28,8 +28,6 @@
                                 @csrf
                                 <button class="btn btn-violet" type="submit">Adicionar à sacola</button>
                             </form>
-                        @else
-                            <a class="btn btn-link w-100 mt-1 small" href="{{ route('login') }}">Entre para montar sua sacola</a>
                         @endauth
                     @endif
                 </div>

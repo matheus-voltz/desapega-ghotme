@@ -21,6 +21,8 @@
                     <a class="btn btn-sm btn-outline-violet" href="{{ route('cart.index') }}">Minha sacola</a>
                     @if(auth()->user()->isAdmin())
                         <a class="nav-link-custom d-none d-md-inline" href="{{ route('admin.products.index') }}">Meu painel</a>
+                    @elseif(auth()->user()->isSeller())
+                        <a class="nav-link-custom d-none d-md-inline" href="{{ route('seller.settings.edit') }}">Painel do vendedor</a>
                     @endif
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

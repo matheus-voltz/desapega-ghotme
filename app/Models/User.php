@@ -19,6 +19,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'account_type',
         'password',
     ];
 
@@ -43,6 +44,16 @@ class User extends Authenticatable
     public function cart(): HasOne
     {
         return $this->hasOne(Cart::class);
+    }
+
+    public function sellerSetting(): HasOne
+    {
+        return $this->hasOne(SellerSetting::class);
+    }
+
+    public function isSeller(): bool
+    {
+        return $this->account_type === 'seller';
     }
 
     public function isAdmin(): bool

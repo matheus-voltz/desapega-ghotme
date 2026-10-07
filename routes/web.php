@@ -7,6 +7,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseClickController;
+use App\Http\Controllers\Seller\SettingsController;
 use App\Http\Controllers\Webhooks\AsaasWebhookController;
 use App\Http\Controllers\Webhooks\ShopeeWebhookController;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
@@ -15,7 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/dashboard', function (Request $request): RedirectResponse {
-    return redirect()->route($request->user()->isAdmin() ? 'admin.products.index' : 'cart.index');
+    return redirect()->route($request->user()->isAdmin() ? 'admin.products.index' : ($request->user()->isSeller() ? 'seller.settings.edit' : 'cart.index'));
 })
     ->middleware('auth')
     ->name('dashboard');
@@ -56,6 +57,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('shopee/configure-push', [AdminShopeeController::class, 'configurePush'])->name('shopee.configure-push');
     Route::post('shopee/sync', [AdminShopeeController::class, 'sync'])->name('shopee.sync');
     Route::delete('shopee/disconnect', [AdminShopeeController::class, 'disconnect'])->name('shopee.disconnect');
+});
+
+Route::middleware(['auth', 'seller'])->prefix('vendedor')->name('seller.')->group(function () {
+    Route::get('/configuracoes', [SettingsController::class, 'edit'])->name('settings.edit');
+    Route::put('/configuracoes', [SettingsController::class, 'update'])->name('settings.update');
 });
 
 require __DIR__.'/auth.php';

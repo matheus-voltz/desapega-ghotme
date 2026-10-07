@@ -1,0 +1,18 @@
+@extends('layouts.app')
+
+@section('title', 'Configurações do vendedor')
+
+@section('content')
+<div class="container py-5" style="max-width: 900px">
+    <div class="mb-4"><div class="eyebrow mb-2">Painel do vendedor</div><h1 class="h2 fw-bold mb-2">Configurações da conta</h1><p class="text-secondary">As credenciais ficam criptografadas e não são exibidas depois de salvas.</p></div>
+    @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
+    <form method="POST" action="{{ route('seller.settings.update') }}" class="card border-0 shadow-sm rounded-4 p-4">
+        @csrf @method('PUT')
+        <h2 class="h5 fw-bold">Asaas</h2><p class="small text-secondary">Use as credenciais da sua própria conta Asaas.</p>
+        <div class="row g-3 mb-4"><div class="col-md-6"><label class="form-label" for="asaas_api_key">Chave da API</label><input class="form-control" id="asaas_api_key" name="asaas_api_key" type="password" autocomplete="new-password">@error('asaas_api_key')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror</div><div class="col-md-6"><label class="form-label" for="asaas_webhook_token">Token do webhook</label><input class="form-control" id="asaas_webhook_token" name="asaas_webhook_token" type="password" autocomplete="new-password">@error('asaas_webhook_token')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror</div></div>
+        <h2 class="h5 fw-bold">Telegram</h2><div class="row g-3 mb-4"><div class="col-md-7"><label class="form-label" for="telegram_bot_token">Token do bot</label><input class="form-control" id="telegram_bot_token" name="telegram_bot_token" type="password" autocomplete="new-password">@error('telegram_bot_token')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror</div><div class="col-md-5"><label class="form-label" for="telegram_chat_id">Chat ID</label><input class="form-control" id="telegram_chat_id" name="telegram_chat_id" type="text">@error('telegram_chat_id')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror</div></div>
+        <h2 class="h5 fw-bold">Shopee</h2><div class="row g-3 mb-4"><div class="col-md-4"><label class="form-label" for="shopee_partner_id">Partner ID</label><input class="form-control" id="shopee_partner_id" name="shopee_partner_id" type="text">@error('shopee_partner_id')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror</div><div class="col-md-4"><label class="form-label" for="shopee_partner_key">Partner key</label><input class="form-control" id="shopee_partner_key" name="shopee_partner_key" type="password" autocomplete="new-password">@error('shopee_partner_key')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror</div><div class="col-md-4"><label class="form-label" for="shopee_shop_id">Shop ID</label><input class="form-control" id="shopee_shop_id" name="shopee_shop_id" type="text">@error('shopee_shop_id')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror</div></div>
+        <button class="btn btn-violet">Salvar configurações</button>
+    </form>
+</div>
+@endsection

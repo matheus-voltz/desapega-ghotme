@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Bundle;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -60,6 +61,21 @@ class CatalogPaginationTest extends TestCase
             ->assertDontSee('Livro raro')
             ->assertDontSee('Console portátil')
             ->assertDontSee('Livro indisponível');
+    }
+
+    public function test_catalog_hides_a_combo_when_one_of_its_products_is_not_available(): void
+    {
+        $availableProduct = Product::factory()->create(['status' => 'available']);
+        $soldProduct = Product::factory()->create(['status' => 'sold']);
+        $availableBundle = Bundle::create(['name' => 'Combo disponível', 'slug' => 'combo-disponivel', 'pix_price' => 100, 'active' => true]);
+        $unavailableBundle = Bundle::create(['name' => 'Combo indisponível', 'slug' => 'combo-indisponivel', 'pix_price' => 100, 'active' => true]);
+        $availableBundle->products()->attach($availableProduct);
+        $unavailableBundle->products()->attach([$availableProduct->id, $soldProduct->id]);
+
+        $this->get(route('catalog.index'))
+            ->assertOk()
+            ->assertSee('Combo disponível')
+            ->assertDontSee('Combo indisponível');
     }
 
     private function createProducts(int $count, string $category = 'Eletrônicos'): void

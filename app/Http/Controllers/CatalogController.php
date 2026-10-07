@@ -47,6 +47,8 @@ class CatalogController extends Controller
         $bundles = Bundle::query()
             ->with('products')
             ->where('active', true)
+            ->has('products')
+            ->whereDoesntHave('products', fn ($productQuery) => $productQuery->where('status', '!=', 'available'))
             ->orderByDesc('id')
             ->get();
 

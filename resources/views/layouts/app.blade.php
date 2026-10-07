@@ -18,7 +18,11 @@
             <nav class="site-nav">
                 <div class="site-nav-desktop d-flex align-items-center gap-2">
                     @auth
-                        @unless(request()->routeIs('landing'))<a class="nav-link-custom" href="{{ route('catalog.index') }}#catalogo">Catálogo</a>@endunless
+                        @if(auth()->user()->isSeller())
+                            <a class="nav-link-custom" href="{{ route('seller.profile', auth()->user()) }}">Meu catálogo</a>
+                        @elseif(! request()->routeIs('landing'))
+                            <a class="nav-link-custom" href="{{ route('catalog.index') }}#catalogo">Catálogo</a>
+                        @endif
                         @if(! auth()->user()->isAdmin() && ! auth()->user()->isSeller())<a class="btn btn-sm btn-outline-violet" href="{{ route('cart.index') }}">Minha sacola</a>@endif
                         @if(auth()->user()->isAdmin())<a class="nav-link-custom" href="{{ route('admin.products.index') }}">Meu painel</a>@elseif(auth()->user()->isSeller())<a class="nav-link-custom" href="{{ route('seller.products.index') }}">Painel do vendedor</a>@endif
                         <form method="POST" action="{{ route('logout') }}">@csrf<button class="btn btn-sm btn-link text-secondary text-decoration-none" type="submit">Sair</button></form>
@@ -30,7 +34,11 @@
                     <summary aria-label="Abrir menu">☰ <span>Menu</span></summary>
                     <div class="site-nav-menu">
                         @auth
-                            @unless(request()->routeIs('landing'))<a href="{{ route('catalog.index') }}#catalogo">Catálogo</a>@endunless
+                            @if(auth()->user()->isSeller())
+                                <a href="{{ route('seller.profile', auth()->user()) }}">Meu catálogo</a>
+                            @elseif(! request()->routeIs('landing'))
+                                <a href="{{ route('catalog.index') }}#catalogo">Catálogo</a>
+                            @endif
                             @if(! auth()->user()->isAdmin() && ! auth()->user()->isSeller())<a href="{{ route('cart.index') }}">Minha sacola</a>@endif
                             @if(auth()->user()->isAdmin())<a href="{{ route('admin.products.index') }}">Meu painel</a>@elseif(auth()->user()->isSeller())<a href="{{ route('seller.products.index') }}">Painel do vendedor</a><a href="{{ route('seller.settings.edit') }}">Configurações</a>@endif
                             <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit">Sair</button></form>

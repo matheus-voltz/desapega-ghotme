@@ -36,4 +36,21 @@ class SellerSettingsTest extends TestCase
             ->assertOk()
             ->assertSee('Prévia administrativa');
     }
+
+    public function test_blank_secret_fields_keep_the_previously_saved_values(): void
+    {
+        $seller = User::factory()->create(['account_type' => 'seller']);
+        $seller->sellerSetting()->create([
+            'asaas_api_key' => 'asaas-secret',
+            'telegram_bot_token' => 'telegram-secret',
+        ]);
+
+        $this->actingAs($seller)
+            ->put(route('seller.settings.update'), [])
+            ->assertRedirect();
+
+        $settings = $seller->fresh()->sellerSetting;
+        $this->assertSame('asaas-secret', $settings->asaas_api_key);
+        $this->assertSame('telegram-secret', $settings->telegram_bot_token);
+    }
 }

@@ -27,8 +27,8 @@
                         <a class="nav-link-custom d-none d-md-inline" href="{{ route('admin.products.index') }}">Meu painel</a>
                         <a class="btn btn-sm btn-outline-violet d-inline-flex d-md-none" href="{{ route('admin.products.index') }}">Painel</a>
                     @elseif(auth()->user()->isSeller())
-                        <a class="nav-link-custom d-none d-md-inline" href="{{ route('seller.settings.edit') }}">Painel do vendedor</a>
-                        <a class="btn btn-sm btn-outline-violet d-inline-flex d-md-none" href="{{ route('seller.settings.edit') }}">Painel</a>
+                        <a class="nav-link-custom d-none d-md-inline" href="{{ route('seller.products.index') }}">Painel do vendedor</a>
+                        <a class="btn btn-sm btn-outline-violet d-inline-flex d-md-none" href="{{ route('seller.products.index') }}">Painel</a>
                     @endif
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

@@ -7,6 +7,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseClickController;
+use App\Http\Controllers\Seller\ProductController as SellerProductController;
 use App\Http\Controllers\Seller\SettingsController;
 use App\Http\Controllers\SellerProfileController;
 use App\Http\Controllers\Webhooks\AsaasWebhookController;
@@ -17,7 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/dashboard', function (Request $request): RedirectResponse {
-    return redirect()->route($request->user()->isAdmin() ? 'admin.products.index' : ($request->user()->isSeller() ? 'seller.settings.edit' : 'cart.index'));
+    return redirect()->route($request->user()->isAdmin() ? 'admin.products.index' : ($request->user()->isSeller() ? 'seller.products.index' : 'cart.index'));
 })
     ->middleware('auth')
     ->name('dashboard');
@@ -62,6 +63,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 });
 
 Route::middleware(['auth', 'seller'])->prefix('vendedor')->name('seller.')->group(function () {
+    Route::resource('itens', SellerProductController::class)->names('products')->except('show');
     Route::get('/configuracoes', [SettingsController::class, 'edit'])->name('settings.edit');
     Route::put('/configuracoes', [SettingsController::class, 'update'])->name('settings.update');
 });

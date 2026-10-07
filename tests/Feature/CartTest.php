@@ -62,6 +62,23 @@ class CartTest extends TestCase
         $this->assertDatabaseCount('cart_items', 0);
     }
 
+    public function test_customer_cannot_mix_items_from_different_sellers_in_one_cart(): void
+    {
+        $customer = User::factory()->create();
+        $firstSeller = User::factory()->create(['account_type' => 'seller']);
+        $secondSeller = User::factory()->create(['account_type' => 'seller']);
+        $firstProduct = Product::factory()->for($firstSeller, 'seller')->create();
+        $secondProduct = Product::factory()->for($secondSeller, 'seller')->create();
+
+        $this->actingAs($customer)->post(route('cart.items.store', $firstProduct));
+
+        $this->actingAs($customer)
+            ->post(route('cart.items.store', $secondProduct))
+            ->assertStatus(422);
+
+        $this->assertDatabaseCount('cart_items', 1);
+    }
+
     public function test_customer_cannot_remove_another_customers_cart_item(): void
     {
         $customer = User::factory()->create();

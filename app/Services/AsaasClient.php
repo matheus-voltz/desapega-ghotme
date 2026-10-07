@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\SellerSetting;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -12,9 +13,9 @@ class AsaasClient
     /**
      * @param  array{name: string, email?: string|null, cpfCnpj?: string|null}  $customer
      */
-    public function createCustomer(array $customer): string
+    public function createCustomer(array $customer, ?SellerSetting $sellerSettings = null): string
     {
-        $response = $this->request()->post($this->baseUrl().'/customers', array_filter($customer));
+        $response = $this->request($sellerSettings)->post($this->baseUrl().'/customers', array_filter($customer));
         $json = $this->decode($response->json(), $response->successful());
         $customerId = (string) ($json['id'] ?? '');
 
@@ -33,8 +34,9 @@ class AsaasClient
         string $amount,
         string $description,
         string $externalReference,
+        ?SellerSetting $sellerSettings = null,
     ): array {
-        $response = $this->request()->post($this->baseUrl().'/payments', [
+        $response = $this->request($sellerSettings)->post($this->baseUrl().'/payments', [
             'customer' => $customerId,
             'billingType' => 'PIX',
             'value' => (float) $amount,
@@ -60,6 +62,7 @@ class AsaasClient
         array $card,
         int $installments,
         string $remoteIp,
+        ?SellerSetting $sellerSettings = null,
     ): array {
         $body = [
             'customer' => $customerId,
@@ -92,7 +95,7 @@ class AsaasClient
             $body['totalValue'] = (float) $amount;
         }
 
-        $response = $this->request()
+        $response = $this->request($sellerSettings)
             ->timeout(max(60, (int) config('asaas.credit_card_timeout', 60)))
             ->post($this->baseUrl().'/payments', $body);
 
@@ -102,9 +105,9 @@ class AsaasClient
     /**
      * @return array<string, mixed>
      */
-    public function getPixQrCode(string $asaasPaymentId): array
+    public function getPixQrCode(string $asaasPaymentId, ?SellerSetting $sellerSettings = null): array
     {
-        $response = $this->request()->retry(2, 300, throw: false)
+        $response = $this->request($sellerSettings)->retry(2, 300, throw: false)
             ->get($this->baseUrl().'/payments/'.$asaasPaymentId.'/pixQrCode');
 
         return $this->decode($response->json(), $response->successful());
@@ -144,22 +147,24 @@ class AsaasClient
         return $this->decode($response->json(), $response->successful());
     }
 
-    public function verifiesWebhookToken(?string $token): bool
+    public function verifiesWebhookToken(?string $token, ?SellerSetting $sellerSettings = null): bool
     {
-        $expectedToken = trim((string) config('asaas.webhook_token'));
+        $expectedToken = trim((string) ($sellerSettings?->asaas_webhook_token ?: config('asaas.webhook_token')));
 
         return $expectedToken !== ''
             && is_string($token)
             && hash_equals($expectedToken, $token);
     }
 
-    private function request(): PendingRequest
+    private function request(?SellerSetting $sellerSettings = null): PendingRequest
     {
-        $this->assertConfigured();
+        $this->assertConfigured($sellerSettings);
+
+        $apiKey = trim((string) ($sellerSettings?->asaas_api_key ?: config('asaas.api_key')));
 
         return Http::asJson()
             ->acceptJson()
-            ->withHeader('access_token', (string) config('asaas.api_key'))
+            ->withHeader('access_token', $apiKey)
             ->timeout(max(1, (int) config('asaas.timeout', 15)));
     }
 
@@ -193,14 +198,14 @@ class AsaasClient
         return $json;
     }
 
-    private function assertConfigured(): void
+    private function assertConfigured(?SellerSetting $sellerSettings = null): void
     {
-        if (! config('asaas.enabled')) {
+        if (! config('asaas.enabled') && ! $sellerSettings?->asaas_api_key) {
             throw new RuntimeException('A integração do Asaas está desativada.');
         }
 
-        if (trim((string) config('asaas.api_key')) === '') {
-            throw new RuntimeException('ASAAS_API_KEY não configurada.');
+        if (trim((string) ($sellerSettings?->asaas_api_key ?: config('asaas.api_key'))) === '') {
+            throw new RuntimeException('O vendedor ainda não configurou a chave do Asaas.');
         }
     }
 }

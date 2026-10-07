@@ -2,27 +2,31 @@
 
 namespace App\Services;
 
+use App\Models\SellerSetting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class TelegramNotifier
 {
-    public function configured(): bool
+    public function configured(?SellerSetting $sellerSettings = null): bool
     {
-        return (bool) config('telegram.enabled')
-            && trim((string) config('telegram.bot_token')) !== ''
-            && trim((string) config('telegram.chat_id')) !== '';
+        $botToken = trim((string) ($sellerSettings?->telegram_bot_token ?: config('telegram.bot_token')));
+        $chatId = trim((string) ($sellerSettings?->telegram_chat_id ?: config('telegram.chat_id')));
+
+        return ((bool) config('telegram.enabled') || $sellerSettings !== null)
+            && $botToken !== ''
+            && $chatId !== '';
     }
 
-    public function send(string $message): bool
+    public function send(string $message, ?SellerSetting $sellerSettings = null): bool
     {
-        if (! $this->configured()) {
+        if (! $this->configured($sellerSettings)) {
             return false;
         }
 
-        $token = trim((string) config('telegram.bot_token'));
-        $chatId = trim((string) config('telegram.chat_id'));
+        $token = trim((string) ($sellerSettings?->telegram_bot_token ?: config('telegram.bot_token')));
+        $chatId = trim((string) ($sellerSettings?->telegram_chat_id ?: config('telegram.chat_id')));
 
         try {
             $response = Http::asForm()

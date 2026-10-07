@@ -15,6 +15,8 @@ class SettingsController extends Controller
             'settings' => $request->user()->sellerSetting,
             'shareUrl' => $request->user()->isSeller() ? route('seller.profile', $request->user()) : null,
             'isPreview' => $request->user()->isAdmin() && ! $request->user()->isSeller(),
+            'productsCount' => $request->user()->isSeller() ? $request->user()->products()->count() : 0,
+            'salesCount' => $request->user()->isSeller() ? $request->user()->sales()->where('status', 'RECEIVED')->count() : 0,
         ]);
     }
 
@@ -29,6 +31,8 @@ class SettingsController extends Controller
             'shopee_partner_key' => ['nullable', 'string', 'max:500'],
             'shopee_shop_id' => ['nullable', 'string', 'max:100'],
         ]);
+
+        $data = array_filter($data, fn (?string $value): bool => $value !== null && trim($value) !== '');
 
         $request->user()->sellerSetting()->updateOrCreate([], $data);
 

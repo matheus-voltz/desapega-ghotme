@@ -39,6 +39,18 @@ class CartController extends Controller
         $cart = $this->cartFor($request->user());
         $this->ensureCartCanBeChanged($cart);
 
+        $cart->load('items.product');
+        $cartSellerIds = $cart->items
+            ->pluck('product.seller_id')
+            ->unique()
+            ->values();
+
+        abort_if(
+            $cartSellerIds->isNotEmpty() && ! $cartSellerIds->contains($product->seller_id),
+            422,
+            'Finalize os itens deste vendedor antes de adicionar itens de outro catálogo.'
+        );
+
         $cartItem = $cart->items()->firstOrCreate(['product_id' => $product->id]);
 
         return to_route('cart.index')->with(

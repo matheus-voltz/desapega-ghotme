@@ -8,7 +8,10 @@ use App\Models\AsaasWebhookEvent;
 use App\Models\Bundle;
 use App\Models\Cart;
 use App\Models\Product;
+use App\Models\SellerSetting;
+use App\Models\User;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -80,6 +83,7 @@ class AsaasPaymentService
 
                 return AsaasPayment::create([
                     'product_id' => $lockedTarget->id,
+                    'seller_id' => $lockedTarget->seller_id,
                     'external_reference' => (string) Str::uuid(),
                     'amount' => $lockedTarget->pix_price,
                     'status' => 'CREATING',
@@ -103,6 +107,8 @@ class AsaasPaymentService
                     throw new RuntimeException('Um ou mais itens da sua sacola não estão mais disponíveis.');
                 }
 
+                $this->ensureProductsBelongToOneSeller($products);
+
                 $activePayment = $this->activePayment($lockedTarget);
                 if ($activePayment) {
                     return $activePayment;
@@ -110,6 +116,7 @@ class AsaasPaymentService
 
                 return AsaasPayment::create([
                     'cart_id' => $lockedTarget->id,
+                    'seller_id' => $products->first()?->seller_id,
                     'external_reference' => (string) Str::uuid(),
                     'amount' => $products->sum(fn (Product $product): float => (float) $product->pix_price),
                     'status' => 'CREATING',
@@ -143,11 +150,12 @@ class AsaasPaymentService
         $payment->update($this->customerDetails($customer));
 
         try {
+            $sellerSettings = $this->settingsForPayment($payment);
             $customerId = $this->client->createCustomer([
                 'name' => $customer['customer_name'],
                 'email' => $customer['customer_email'] ?? null,
                 'cpfCnpj' => $customer['customer_cpf_cnpj'] ?? null,
-            ]);
+            ], $sellerSettings);
 
             $description = $this->paymentDescription($payment);
 
@@ -156,6 +164,7 @@ class AsaasPaymentService
                 (string) $payment->amount,
                 $description,
                 $payment->external_reference,
+                $sellerSettings,
             );
 
             $asaasPaymentId = (string) ($asaasPayment['id'] ?? '');
@@ -196,7 +205,7 @@ class AsaasPaymentService
                 }
 
                 $price = (float) $lockedTarget->marketplace_price;
-                $paymentAttributes = ['product_id' => $lockedTarget->id];
+                $paymentAttributes = ['product_id' => $lockedTarget->id, 'seller_id' => $lockedTarget->seller_id];
             } else {
                 $lockedTarget = Cart::query()->lockForUpdate()->findOrFail($target->id);
                 $cartItems = $lockedTarget->items()->lockForUpdate()->get();
@@ -218,8 +227,10 @@ class AsaasPaymentService
                     throw new RuntimeException('Um ou mais itens da sua sacola não têm preço total para pagamento no cartão.');
                 }
 
+                $this->ensureProductsBelongToOneSeller($products);
+
                 $price = $products->sum(fn (Product $product): float => (float) $product->marketplace_price);
-                $paymentAttributes = ['cart_id' => $lockedTarget->id];
+                $paymentAttributes = ['cart_id' => $lockedTarget->id, 'seller_id' => $products->first()?->seller_id];
             }
 
             $this->ensurePaymentIsNotBeingCreated($lockedTarget);
@@ -238,11 +249,12 @@ class AsaasPaymentService
         $payment->update($this->customerDetails($details));
 
         try {
+            $sellerSettings = $this->settingsForPayment($payment);
             $customerId = $this->client->createCustomer([
                 'name' => $details['customer_name'],
                 'email' => $details['customer_email'],
                 'cpfCnpj' => $details['customer_cpf_cnpj'],
-            ]);
+            ], $sellerSettings);
 
             $description = $this->paymentDescription($payment);
 
@@ -269,6 +281,7 @@ class AsaasPaymentService
                 ],
                 $details['installments'],
                 $remoteIp,
+                $sellerSettings,
             );
 
             $asaasPaymentId = (string) ($asaasPayment['id'] ?? '');
@@ -376,7 +389,7 @@ class AsaasPaymentService
             return $payment;
         }
 
-        $qrCode = $this->client->getPixQrCode((string) $payment->asaas_payment_id);
+        $qrCode = $this->client->getPixQrCode((string) $payment->asaas_payment_id, $this->settingsForPayment($payment));
         $payload = trim((string) ($qrCode['payload'] ?? ''));
         $encodedImage = trim((string) ($qrCode['encodedImage'] ?? ''));
 
@@ -498,6 +511,31 @@ class AsaasPaymentService
         if ($product->status !== 'available') {
             throw new RuntimeException('Este produto não está mais disponível.');
         }
+    }
+
+    /**
+     * @param  Collection<int, Product>  $products
+     */
+    private function ensureProductsBelongToOneSeller(Collection $products): void
+    {
+        if ($products->pluck('seller_id')->unique()->count() > 1) {
+            throw new RuntimeException('Finalize os itens de cada vendedor em sacolas separadas.');
+        }
+    }
+
+    private function settingsForPayment(AsaasPayment $payment): ?SellerSetting
+    {
+        if ($payment->seller_id === null) {
+            return null;
+        }
+
+        $payment->loadMissing('seller.sellerSetting');
+        $seller = $payment->seller;
+        if (! $seller instanceof User || ! $seller->sellerSetting?->asaas_api_key) {
+            throw new RuntimeException('Este vendedor ainda não configurou o recebimento pelo Asaas.');
+        }
+
+        return $seller->sellerSetting;
     }
 
     private function paymentDescription(AsaasPayment $payment): string

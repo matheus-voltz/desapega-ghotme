@@ -23,7 +23,7 @@ class SaleNotifier
             '<a href="'.e(route('catalog.product', $product)).'">Abrir produto</a>',
         ]);
 
-        $this->telegram->send($message);
+        $this->telegram->send($message, $product->seller?->sellerSetting);
     }
 
     /**
@@ -53,6 +53,6 @@ class SaleNotifier
             '<b>Horário:</b> '.now()->format('d/m/Y H:i:s'),
         ]);
 
-        $this->telegram->send($message);
+        $this->telegram->send($message, $payment->seller?->sellerSetting);
     }
 }

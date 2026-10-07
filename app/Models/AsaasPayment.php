@@ -12,6 +12,7 @@ class AsaasPayment extends Model
         'product_id',
         'bundle_id',
         'cart_id',
+        'seller_id',
         'external_reference',
         'asaas_payment_id',
         'asaas_customer_id',
@@ -23,6 +24,10 @@ class AsaasPayment extends Model
         'customer_address_complement',
         'amount',
         'status',
+        'fulfillment_status',
+        'delivery_method',
+        'tracking_code',
+        'seller_note',
         'pix_payload',
         'pix_encoded_image',
         'pix_expires_at',
@@ -48,6 +53,11 @@ class AsaasPayment extends Model
     public function cart(): BelongsTo
     {
         return $this->belongsTo(Cart::class);
+    }
+
+    public function seller(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'seller_id');
     }
 
     public function webhookEvents(): HasMany

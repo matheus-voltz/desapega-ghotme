@@ -15,13 +15,18 @@
             <article class="product-admin-card">
                 <div class="d-flex justify-content-between gap-2"><strong>{{ $product->name }}</strong><span class="status status-{{ $product->status }}">{{ $product->status_label }}</span></div>
                 <div class="small text-secondary mt-2">Pix: <strong>R$ {{ number_format($product->pix_price, 2, ',', '.') }}</strong> · {{ $product->marketplace_url ? 'Com link Shopee' : 'Sem link Shopee' }}</div>
+                <form method="POST" action="{{ route('admin.products.visibility', $product) }}" class="mt-3">
+                    @csrf @method('PATCH')
+                    <input type="hidden" name="is_visible" value="0">
+                    <label class="form-check form-switch mb-0 d-flex align-items-center gap-2"><input class="form-check-input m-0" type="checkbox" name="is_visible" value="1" @checked($product->is_visible) onchange="this.form.submit()"><span class="small fw-semibold">{{ $product->is_visible ? 'Exibido no catálogo' : 'Oculto do catálogo' }}</span></label>
+                </form>
                 <div class="d-flex gap-2 mt-3"><a class="btn btn-sm btn-outline-dark flex-grow-1" href="{{ route('admin.products.edit', $product) }}">Editar</a><form method="POST" action="{{ route('admin.products.destroy', $product) }}" onsubmit="return confirm('Excluir este produto?')">@csrf @method('DELETE')<button class="btn btn-sm btn-outline-danger">Excluir</button></form></div>
             </article>
         @endforeach
     </div>
     <div class="table-responsive bg-white rounded-4 shadow-sm d-none d-md-block">
         <table class="table align-middle mb-0">
-            <thead><tr><th>Produto</th><th>Status</th><th>Pix</th><th>Cartão</th><th>Última sincronização</th><th></th></tr></thead>
+            <thead><tr><th>Produto</th><th>Status</th><th>Pix</th><th>Cartão</th><th>Catálogo</th><th>Última sincronização</th><th></th></tr></thead>
             <tbody>
             @foreach($products as $product)
                 <tr>
@@ -46,6 +51,13 @@
                         @if($product->shopee_order_status)
                             <div class="small text-secondary">{{ $product->shopee_order_status }}</div>
                         @endif
+                    </td>
+                    <td>
+                        <form method="POST" action="{{ route('admin.products.visibility', $product) }}">
+                            @csrf @method('PATCH')
+                            <input type="hidden" name="is_visible" value="0">
+                            <label class="form-check form-switch mb-0 d-flex align-items-center gap-2"><input class="form-check-input m-0" type="checkbox" name="is_visible" value="1" @checked($product->is_visible) onchange="this.form.submit()"><span class="small">{{ $product->is_visible ? 'Exibido' : 'Oculto' }}</span></label>
+                        </form>
                     </td>
                     <td class="small text-secondary">{{ $product->shopee_synced_at?->format('d/m/Y H:i') ?? '—' }}</td>
                     <td class="text-end text-nowrap">

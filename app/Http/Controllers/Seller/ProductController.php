@@ -90,6 +90,24 @@ class ProductController extends Controller
         return to_route('seller.products.index')->with('success', 'Item removido do seu catálogo.');
     }
 
+    public function updateVisibility(Request $request, Product $product): RedirectResponse
+    {
+        $this->ensureOwner($request, $product);
+
+        $data = $request->validate([
+            'is_visible' => ['required', 'boolean'],
+        ]);
+
+        $product->update([
+            'is_visible' => (bool) $data['is_visible'],
+        ]);
+
+        return back()->with(
+            'success',
+            $product->is_visible ? 'Item exibido no catálogo.' : 'Item ocultado do catálogo.'
+        );
+    }
+
     /**
      * @return array<string, mixed>
      */

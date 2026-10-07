@@ -59,4 +59,29 @@ class SellerProductTest extends TestCase
             'seller_id' => $seller->id,
         ]);
     }
+
+    public function test_seller_can_toggle_visibility_of_their_own_item(): void
+    {
+        $seller = User::factory()->create(['account_type' => 'seller']);
+        $product = Product::factory()->for($seller, 'seller')->create(['is_visible' => true]);
+
+        $this->actingAs($seller)
+            ->patch(route('seller.products.visibility', $product), ['is_visible' => false])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'is_visible' => false,
+        ]);
+    }
+
+    public function test_seller_cannot_toggle_visibility_of_another_sellers_item(): void
+    {
+        $seller = User::factory()->create(['account_type' => 'seller']);
+        $otherProduct = Product::factory()->for(User::factory()->state(['account_type' => 'seller']), 'seller')->create();
+
+        $this->actingAs($seller)
+            ->patch(route('seller.products.visibility', $otherProduct), ['is_visible' => false])
+            ->assertNotFound();
+    }
 }

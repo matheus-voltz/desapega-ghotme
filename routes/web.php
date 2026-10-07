@@ -57,6 +57,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::patch('products/{product}/visibilidade', [AdminProductController::class, 'updateVisibility'])->name('products.visibility');
     Route::resource('products', AdminProductController::class)->except('show');
     Route::resource('bundles', AdminBundleController::class)->except('show');
     Route::get('shopee', [AdminShopeeController::class, 'index'])->name('shopee.index');
@@ -68,6 +69,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 });
 
 Route::middleware(['auth', 'seller'])->prefix('vendedor')->name('seller.')->group(function () {
+    Route::patch('itens/{product}/visibilidade', [SellerProductController::class, 'updateVisibility'])->name('products.visibility');
     Route::resource('itens', SellerProductController::class)
         ->parameters(['itens' => 'product'])
         ->names('products')

@@ -96,6 +96,22 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')->with('success', 'Produto excluído.');
     }
 
+    public function updateVisibility(Request $request, Product $product)
+    {
+        $data = $request->validate([
+            'is_visible' => ['required', 'boolean'],
+        ]);
+
+        $product->update([
+            'is_visible' => (bool) $data['is_visible'],
+        ]);
+
+        return back()->with(
+            'success',
+            $product->is_visible ? 'Produto exibido no catálogo.' : 'Produto ocultado do catálogo.'
+        );
+    }
+
     private function validated(Request $request): array
     {
         return $request->validate([

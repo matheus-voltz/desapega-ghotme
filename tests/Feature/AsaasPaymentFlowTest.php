@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\AsaasPayment;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
@@ -180,6 +181,27 @@ class AsaasPaymentFlowTest extends TestCase
             ->assertNotFound();
 
         $this->assertDatabaseCount('asaas_payments', 0);
+    }
+
+    public function test_seller_without_asaas_offers_a_manual_pix_key_and_hides_credit_card(): void
+    {
+        $seller = User::factory()->create(['account_type' => 'seller']);
+        $seller->sellerSetting()->create(['pix_key' => 'vendedor@example.com']);
+        $product = $this->product();
+        $product->update(['seller_id' => $seller->id]);
+
+        $this->get(route('catalog.product', $product))
+            ->assertOk()
+            ->assertSee('Comprar no Pix')
+            ->assertDontSee('Pagar com cartão em até 12x');
+
+        $this->get(route('purchase.product.pix', $product))
+            ->assertOk()
+            ->assertSee('vendedor@example.com')
+            ->assertSee('Pix direto para o vendedor')
+            ->assertDontSee('Gerar Pix de');
+
+        $this->get(route('purchase.product.card', $product))->assertNotFound();
     }
 
     public function test_it_does_not_flash_credit_card_number_or_cvv_after_validation_fails(): void

@@ -21,13 +21,14 @@ class CartController extends Controller
     public function index(Request $request): View
     {
         $cart = $this->cartFor($request->user());
-        $cart->load('items.product');
+        $cart->load('items.product.seller.sellerSetting');
 
         $total = $cart->items->sum(fn (CartItem $item): float => (float) $item->product->pix_price);
         $canCheckout = $cart->items->isNotEmpty()
             && $cart->items->every(fn (CartItem $item): bool => $item->product->status === 'available');
         $canPayByCard = $canCheckout
-            && $cart->items->every(fn (CartItem $item): bool => $item->product->marketplace_price !== null);
+            && $cart->items->every(fn (CartItem $item): bool => $item->product->marketplace_price !== null
+                && ($item->product->seller_id === null || (bool) $item->product->seller?->sellerSetting?->asaas_api_key));
 
         return view('cart.index', compact('cart', 'total', 'canCheckout', 'canPayByCard'));
     }
@@ -39,7 +40,7 @@ class CartController extends Controller
         $cart = $this->cartFor($request->user());
         $this->ensureCartCanBeChanged($cart);
 
-        $cart->load('items.product');
+        $cart->load('items.product.seller.sellerSetting');
         $cartSellerIds = $cart->items
             ->pluck('product.seller_id')
             ->unique()
@@ -91,6 +92,7 @@ class CartController extends Controller
             'backUrl' => route('cart.index'),
             'products' => $cart->items->pluck('product'),
             'payment' => $payment,
+            'manualPixKey' => $this->manualPixKey($cart),
             'createPaymentUrl' => route('cart.pix.create'),
             'isCartPayment' => true,
         ]);
@@ -101,6 +103,8 @@ class CartController extends Controller
         AsaasPaymentService $payments,
     ): RedirectResponse {
         $cart = $this->cartFor($request->user());
+
+        abort_if($this->manualPixKey($cart) !== null, 422, 'Este vendedor recebe Pix diretamente pela chave informada.');
 
         try {
             $payment = $payments->createForCart($cart, $request->validated());
@@ -114,7 +118,7 @@ class CartController extends Controller
     public function card(Request $request, CreditCardInstallmentCalculator $installments): View
     {
         $cart = $this->cartFor($request->user());
-        $cart->load('items.product');
+        $cart->load('items.product.seller.sellerSetting');
         $payment = $this->paymentForCart($request, $cart);
 
         abort_if($cart->items->isEmpty(), 422, 'Adicione pelo menos um item à sua sacola.');
@@ -127,6 +131,12 @@ class CartController extends Controller
             ! $payment && $cart->items->contains(fn (CartItem $item): bool => $item->product->marketplace_price === null),
             422,
             'Um ou mais itens da sua sacola não têm preço total para pagamento no cartão.'
+        );
+        abort_if(
+            ! $payment && $cart->items->contains(fn (CartItem $item): bool => $item->product->seller_id !== null
+                && ! $item->product->seller?->sellerSetting?->asaas_api_key),
+            422,
+            'Este vendedor ainda não aceita cartão.'
         );
 
         $price = $cart->items->sum(fn (CartItem $item): float => (float) $item->product->marketplace_price);
@@ -188,5 +198,19 @@ class CartController extends Controller
             ->exists();
 
         abort_if($hasPaymentInProgress, 409, 'A sua sacola não pode ser alterada enquanto este pagamento estiver em andamento.');
+    }
+
+    private function manualPixKey(Cart $cart): ?string
+    {
+        $cart->loadMissing('items.product.seller.sellerSetting');
+        $product = $cart->items->first()?->product;
+
+        if (! $product || $product->seller_id === null || $product->seller?->sellerSetting?->asaas_api_key) {
+            return null;
+        }
+
+        $pixKey = trim((string) $product->seller?->sellerSetting?->pix_key);
+
+        return $pixKey === '' ? null : $pixKey;
     }
 }

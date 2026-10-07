@@ -62,6 +62,8 @@ class CatalogController extends Controller
 
     public function product(Product $product)
     {
+        $product->load('seller.sellerSetting');
+
         return view('catalog.product', compact('product'));
     }
 

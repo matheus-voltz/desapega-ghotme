@@ -26,8 +26,11 @@ class PurchaseClickController extends Controller
      */
     public function productPix(Request $request, Product $product): View
     {
+        $product->loadMissing('seller.sellerSetting');
         $payment = $this->paymentForProduct($request, $product);
         abort_unless($payment || $product->status === 'available', 409, 'Este produto não está mais disponível.');
+
+        $manualPixKey = $this->manualPixKey($product);
 
         return view('catalog.pix', [
             'title' => $product->name,
@@ -35,6 +38,7 @@ class PurchaseClickController extends Controller
             'backUrl' => route('catalog.product', $product),
             'products' => collect([$product]),
             'payment' => $payment,
+            'manualPixKey' => $manualPixKey,
             'createPaymentUrl' => route('purchase.product.pix.create', $product),
         ]);
     }
@@ -44,6 +48,7 @@ class PurchaseClickController extends Controller
         Product $product,
         AsaasPaymentService $payments,
     ): RedirectResponse {
+        abort_if($this->manualPixKey($product) !== null, 422, 'Este vendedor recebe Pix diretamente pela chave informada.');
         try {
             $payment = $payments->createForProduct($product, $request->validated());
         } catch (RuntimeException $exception) {
@@ -67,6 +72,8 @@ class PurchaseClickController extends Controller
     public function productCard(Request $request, Product $product): View
     {
         abort_if($product->marketplace_price === null, 404, 'O preço para cartão ainda não foi configurado neste item.');
+        $product->loadMissing('seller.sellerSetting');
+        abort_if($product->seller_id !== null && ! $product->seller?->sellerSetting?->asaas_api_key, 404, 'Este vendedor ainda não aceita cartão.');
 
         $payment = $this->paymentForProduct($request, $product);
         abort_unless($payment || $product->status === 'available', 409, 'Este produto não está mais disponível.');
@@ -87,6 +94,8 @@ class PurchaseClickController extends Controller
         AsaasPaymentService $payments,
     ): RedirectResponse {
         abort_if($product->marketplace_price === null, 404, 'O preço para cartão ainda não foi configurado neste item.');
+        $product->loadMissing('seller.sellerSetting');
+        abort_if($product->seller_id !== null && ! $product->seller?->sellerSetting?->asaas_api_key, 404, 'Este vendedor ainda não aceita cartão.');
 
         try {
             $payment = $payments->createCreditCardForProduct($product, $request->validated(), (string) $request->ip());
@@ -187,5 +196,16 @@ class PurchaseClickController extends Controller
         return $bundle->asaasPayments()
             ->where('external_reference', $reference)
             ->firstOrFail();
+    }
+
+    private function manualPixKey(Product $product): ?string
+    {
+        if ($product->seller_id === null || $product->seller?->sellerSetting?->asaas_api_key) {
+            return null;
+        }
+
+        $pixKey = trim((string) $product->seller?->sellerSetting?->pix_key);
+
+        return $pixKey === '' ? null : $pixKey;
     }
 }

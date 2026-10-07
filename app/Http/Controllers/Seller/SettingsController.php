@@ -25,6 +25,7 @@ class SettingsController extends Controller
         $data = $request->validate([
             'asaas_api_key' => ['nullable', 'string', 'max:500'],
             'asaas_webhook_token' => ['nullable', 'string', 'max:500'],
+            'pix_key' => ['nullable', 'string', 'max:300'],
             'telegram_bot_token' => ['nullable', 'string', 'max:500'],
             'telegram_chat_id' => ['nullable', 'string', 'max:100'],
             'shopee_partner_id' => ['nullable', 'string', 'max:100'],

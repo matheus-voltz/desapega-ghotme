@@ -3,6 +3,10 @@
 @section('title', $product->name)
 
 @section('content')
+@php
+    $sellerUsesAsaas = $product->seller_id === null || (bool) $product->seller?->sellerSetting?->asaas_api_key;
+    $sellerHasManualPix = ! $sellerUsesAsaas && (bool) $product->seller?->sellerSetting?->pix_key;
+@endphp
 <div class="container py-5">
     <a href="{{ route('catalog.index') }}" class="back-link">← Voltar ao catálogo</a>
     <div class="row g-5 mt-1">
@@ -53,8 +57,8 @@
                     @else
                         <a href="{{ route('login') }}" class="btn btn-outline-violet btn-lg">Entrar para adicionar à sacola</a>
                     @endauth
-                    <a href="{{ route('purchase.product.pix', $product) }}" class="btn btn-violet btn-lg">Comprar no Pix</a>
-                    @if($product->marketplace_price !== null)
+                    @if($sellerUsesAsaas || $sellerHasManualPix)<a href="{{ route('purchase.product.pix', $product) }}" class="btn btn-violet btn-lg">Comprar no Pix</a>@endif
+                    @if($product->marketplace_price !== null && $sellerUsesAsaas)
                         <a href="{{ route('purchase.product.card', $product) }}" class="btn btn-outline-violet btn-lg">Pagar com cartão em até 12x</a>
                     @endif
                     @if($product->marketplace_url)

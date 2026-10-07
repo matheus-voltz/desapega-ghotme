@@ -11,6 +11,7 @@
         'CONFIRMED' => 2,
         default => 1,
     };
+    $manualPixKey = $manualPixKey ?? null;
 @endphp
 
 <div class="container py-5" style="max-width: 760px">
@@ -27,7 +28,11 @@
                 <div class="alert alert-danger text-start">{{ session('error') }}</div>
             @endif
 
-            @if($payment)
+            @if($manualPixKey)
+                <div class="alert alert-warning text-start">Este é um Pix direto para o vendedor. A confirmação não é automática: guarde seu comprovante até combinar a entrega.</div>
+                <p class="text-secondary mb-3">Copie a chave abaixo no aplicativo do seu banco e pague exatamente o valor informado.</p>
+                <div class="mt-3 text-start"><label for="pix-copy-paste" class="form-label fw-semibold">Chave Pix do vendedor</label><div class="input-group"><input id="pix-copy-paste" type="text" class="form-control" value="{{ $manualPixKey }}" readonly><button type="button" class="btn btn-outline-violet" id="copy-pix">Copiar</button></div></div>
+            @elseif($payment)
                 <img src="data:image/png;base64,{{ $payment->pix_encoded_image }}" alt="QR Code Pix" class="img-fluid border rounded-4 p-2 bg-white my-3" style="max-width: 340px">
                 <p class="text-secondary mb-2">Escaneie o QR Code pelo aplicativo do seu banco e confirme o valor.</p>
 
@@ -97,11 +102,11 @@
                 </div>
             @endif
 
-            <div class="small text-secondary mt-4">Os itens só são marcados como vendidos depois que o Asaas confirma o pagamento.</div>
+            <div class="small text-secondary mt-4">{{ $manualPixKey ? 'O vendedor confirma este pagamento manualmente.' : 'Os itens só são marcados como vendidos depois que o Asaas confirma o pagamento.' }}</div>
         </div>
     </div>
 
-    <section class="order-journey mt-5" @if($payment) data-payment-status-url="{{ route('purchase.payment.status', $payment) }}" @endif>
+    @if(! $manualPixKey)<section class="order-journey mt-5" @if($payment) data-payment-status-url="{{ route('purchase.payment.status', $payment) }}" @endif>
         <div class="text-center mb-4">
             <div class="eyebrow mb-2">Depois do pagamento</div>
             <h2 class="h3 fw-bold mb-2">Acompanhe cada etapa do seu pedido</h2>
@@ -115,6 +120,7 @@
         </div>
         <div class="order-info mt-3" data-order-info>{{ $stage === 4 ? '✦ Pagamento recebido. Pedido concluído!' : '✦ Aguardando a confirmação do Pix.' }}</div>
     </section>
+    @endif
 </div>
 @endsection
 

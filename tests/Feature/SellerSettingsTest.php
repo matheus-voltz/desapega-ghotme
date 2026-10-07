@@ -19,12 +19,14 @@ class SellerSettingsTest extends TestCase
 
         $this->actingAs($seller)->put(route('seller.settings.update'), [
             'asaas_api_key' => 'asaas-secret',
+            'pix_key' => 'vendedor@example.com',
             'telegram_bot_token' => 'telegram-secret',
             'telegram_chat_id' => '8086091054',
         ])->assertRedirect();
 
         $this->assertDatabaseMissing('seller_settings', ['asaas_api_key' => 'asaas-secret']);
         $this->assertSame('asaas-secret', $seller->fresh()->sellerSetting->asaas_api_key);
+        $this->assertSame('vendedor@example.com', $seller->fresh()->sellerSetting->pix_key);
     }
 
     public function test_administrator_can_preview_seller_settings(): void

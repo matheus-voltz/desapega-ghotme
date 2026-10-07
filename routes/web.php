@@ -8,6 +8,7 @@ use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseClickController;
 use App\Http\Controllers\Seller\SettingsController;
+use App\Http\Controllers\SellerProfileController;
 use App\Http\Controllers\Webhooks\AsaasWebhookController;
 use App\Http\Controllers\Webhooks\ShopeeWebhookController;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
@@ -64,5 +65,7 @@ Route::middleware(['auth', 'seller'])->prefix('vendedor')->name('seller.')->grou
     Route::get('/configuracoes', [SettingsController::class, 'edit'])->name('settings.edit');
     Route::put('/configuracoes', [SettingsController::class, 'update'])->name('settings.update');
 });
+
+Route::get('/vendedor/{seller:public_slug}', [SellerProfileController::class, 'show'])->name('seller.profile');
 
 require __DIR__.'/auth.php';

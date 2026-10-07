@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
@@ -16,6 +17,7 @@ class Product extends Model
 
     protected $fillable = [
         'name',
+        'seller_id',
         'slug',
         'category',
         'condition',
@@ -44,6 +46,11 @@ class Product extends Model
     public function bundles(): BelongsToMany
     {
         return $this->belongsToMany(Bundle::class);
+    }
+
+    public function seller(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'seller_id');
     }
 
     public function asaasPayments(): HasMany

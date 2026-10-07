@@ -11,7 +11,7 @@ class SettingsController extends Controller
 {
     public function edit(Request $request): View
     {
-        return view('seller.settings', ['settings' => $request->user()->sellerSetting]);
+        return view('seller.settings', ['settings' => $request->user()->sellerSetting, 'shareUrl' => route('seller.profile', $request->user())]);
     }
 
     public function update(Request $request): RedirectResponse

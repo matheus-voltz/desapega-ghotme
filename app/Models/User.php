@@ -6,6 +6,7 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -20,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'account_type',
+        'public_slug',
         'password',
     ];
 
@@ -49,6 +51,11 @@ class User extends Authenticatable
     public function sellerSetting(): HasOne
     {
         return $this->hasOne(SellerSetting::class);
+    }
+
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class, 'seller_id');
     }
 
     public function isSeller(): bool

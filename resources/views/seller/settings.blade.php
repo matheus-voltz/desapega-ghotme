@@ -6,6 +6,7 @@
 <div class="container py-5" style="max-width: 900px">
     <div class="mb-4"><div class="eyebrow mb-2">Painel do vendedor</div><h1 class="h2 fw-bold mb-2">Configurações da conta</h1><p class="text-secondary">As credenciais ficam criptografadas e não são exibidas depois de salvas.</p></div>
     @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4"><h2 class="h5 fw-bold">Seu link público</h2><p class="text-secondary small">Compartilhe este endereço para mostrar seus itens disponíveis.</p><div class="input-group"><input class="form-control" value="{{ $shareUrl }}" readonly><button type="button" class="btn btn-outline-violet" data-copy-link="{{ $shareUrl }}">Copiar link</button></div></div>
     <form method="POST" action="{{ route('seller.settings.update') }}" class="card border-0 shadow-sm rounded-4 p-4">
         @csrf @method('PUT')
         <h2 class="h5 fw-bold">Asaas</h2><p class="small text-secondary">Use as credenciais da sua própria conta Asaas.</p>
@@ -16,3 +17,5 @@
     </form>
 </div>
 @endsection
+
+@push('scripts')<script>document.querySelector('[data-copy-link]')?.addEventListener('click', async (event) => { await navigator.clipboard.writeText(event.currentTarget.dataset.copyLink); event.currentTarget.textContent = 'Copiado'; });</script>@endpush

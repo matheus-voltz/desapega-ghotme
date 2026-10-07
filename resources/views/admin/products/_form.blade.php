@@ -9,6 +9,10 @@
         <input name="category" class="form-control" value="{{ old('category', $product?->category) }}" placeholder="Livros, Jogos...">
     </div>
     <div class="col-md-4">
+        <label class="form-label">Vendedor</label>
+        <select name="seller_id" class="form-select"><option value="">Catálogo geral</option>@foreach($sellers as $seller)<option value="{{ $seller->id }}" @selected((string) old('seller_id', $product?->seller_id) === (string) $seller->id)>{{ $seller->name }} — {{ $seller->email }}</option>@endforeach</select>
+    </div>
+    <div class="col-md-4">
         <label class="form-label">Estado</label>
         <input name="condition" class="form-control" value="{{ old('condition', $product?->condition) }}" placeholder="Excelente, marcas de uso...">
     </div>

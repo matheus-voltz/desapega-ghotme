@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\User;
 use App\Services\SaleNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -23,7 +24,7 @@ class ProductController extends Controller
 
     public function create()
     {
-        return view('admin.products.create');
+        return view('admin.products.create', ['sellers' => User::where('account_type', 'seller')->orderBy('name')->get()]);
     }
 
     public function store(Request $request)
@@ -48,7 +49,7 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        return view('admin.products.edit', compact('product'));
+        return view('admin.products.edit', ['product' => $product, 'sellers' => User::where('account_type', 'seller')->orderBy('name')->get()]);
     }
 
     public function update(Request $request, Product $product)
@@ -99,6 +100,7 @@ class ProductController extends Controller
     {
         return $request->validate([
             'name' => ['required', 'string', 'max:150'],
+            'seller_id' => ['nullable', 'integer', 'exists:users,id'],
             'category' => ['nullable', 'string', 'max:100'],
             'condition' => ['nullable', 'string', 'max:100'],
             'description' => ['nullable', 'string'],

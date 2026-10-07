@@ -25,6 +25,7 @@
                         @endif
                         @if(! auth()->user()->isAdmin() && ! auth()->user()->isSeller())<a class="btn btn-sm btn-outline-violet" href="{{ route('cart.index') }}">Minha sacola</a>@endif
                         @if(auth()->user()->isAdmin())<a class="nav-link-custom" href="{{ route('admin.products.index') }}">Meu painel</a>@elseif(auth()->user()->isSeller())<a class="nav-link-custom" href="{{ route('seller.products.index') }}">Painel do vendedor</a>@endif
+                        <a class="nav-link-custom" href="{{ route('profile.edit') }}">Minha conta</a>
                         <form method="POST" action="{{ route('logout') }}">@csrf<button class="btn btn-sm btn-link text-secondary text-decoration-none" type="submit">Sair</button></form>
                     @else
                         <a class="btn btn-sm btn-outline-violet" href="{{ route('login') }}">Entrar na conta</a>
@@ -41,6 +42,7 @@
                             @endif
                             @if(! auth()->user()->isAdmin() && ! auth()->user()->isSeller())<a href="{{ route('cart.index') }}">Minha sacola</a>@endif
                             @if(auth()->user()->isAdmin())<a href="{{ route('admin.products.index') }}">Meu painel</a>@elseif(auth()->user()->isSeller())<a href="{{ route('seller.products.index') }}">Painel do vendedor</a><a href="{{ route('seller.settings.edit') }}">Configurações</a>@endif
+                            <a href="{{ route('profile.edit') }}">Minha conta</a>
                             <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit">Sair</button></form>
                         @else
                             <a class="menu-highlight" href="{{ route('login') }}">Entrar na conta</a>

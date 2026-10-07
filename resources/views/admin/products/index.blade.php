@@ -10,7 +10,16 @@
         <a href="{{ route('admin.products.create') }}" class="btn btn-dark">Novo produto</a>
     </div>
     @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
-    <div class="table-responsive bg-white rounded-4 shadow-sm">
+    <div class="d-md-none product-admin-cards">
+        @foreach($products as $product)
+            <article class="product-admin-card">
+                <div class="d-flex justify-content-between gap-2"><strong>{{ $product->name }}</strong><span class="status status-{{ $product->status }}">{{ $product->status_label }}</span></div>
+                <div class="small text-secondary mt-2">Pix: <strong>R$ {{ number_format($product->pix_price, 2, ',', '.') }}</strong> · {{ $product->marketplace_url ? 'Com link Shopee' : 'Sem link Shopee' }}</div>
+                <div class="d-flex gap-2 mt-3"><a class="btn btn-sm btn-outline-dark flex-grow-1" href="{{ route('admin.products.edit', $product) }}">Editar</a><form method="POST" action="{{ route('admin.products.destroy', $product) }}" onsubmit="return confirm('Excluir este produto?')">@csrf @method('DELETE')<button class="btn btn-sm btn-outline-danger">Excluir</button></form></div>
+            </article>
+        @endforeach
+    </div>
+    <div class="table-responsive bg-white rounded-4 shadow-sm d-none d-md-block">
         <table class="table align-middle mb-0">
             <thead><tr><th>Produto</th><th>Status</th><th>Pix</th><th>Cartão</th><th>Última sincronização</th><th></th></tr></thead>
             <tbody>
@@ -51,6 +60,6 @@
             </tbody>
         </table>
     </div>
-    <div class="mt-3">{{ $products->links() }}</div>
+    <div class="mt-4">@include('components.pagination-controls', ['paginator' => $products])</div>
 </div>
 @endsection

@@ -29,6 +29,6 @@
             </tbody>
         </table>
     </div>
-    <div class="mt-3">{{ $bundles->links() }}</div>
+    <div class="mt-4">@include('components.pagination-controls', ['paginator' => $bundles])</div>
 </div>
 @endsection

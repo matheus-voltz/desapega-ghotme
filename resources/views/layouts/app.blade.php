@@ -15,18 +15,20 @@
     <header class="site-header">
         <div class="container d-flex align-items-center justify-content-between py-3">
             <a class="brand" href="{{ route('landing') }}"><span class="brand-mark">D</span><span>Desapega<span class="brand-muted">.ghotme</span></span></a>
-            <nav class="d-flex align-items-center gap-2">
+            <nav class="site-nav d-flex align-items-center gap-2">
                 @if(request()->routeIs('landing'))
                     <a class="nav-link-custom d-none d-sm-inline" href="{{ route('login') }}">Entrar na conta</a>
                 @else
                     <a class="nav-link-custom d-none d-sm-inline" href="{{ route('catalog.index') }}#catalogo">Catálogo</a>
                 @endif
                 @auth
-                    <a class="btn btn-sm btn-outline-violet" href="{{ route('cart.index') }}">Minha sacola</a>
+                    <a class="btn btn-sm btn-outline-violet d-none d-sm-inline-flex" href="{{ route('cart.index') }}">Minha sacola</a>
                     @if(auth()->user()->isAdmin())
                         <a class="nav-link-custom d-none d-md-inline" href="{{ route('admin.products.index') }}">Meu painel</a>
+                        <a class="btn btn-sm btn-outline-violet d-inline-flex d-md-none" href="{{ route('admin.products.index') }}">Painel</a>
                     @elseif(auth()->user()->isSeller())
                         <a class="nav-link-custom d-none d-md-inline" href="{{ route('seller.settings.edit') }}">Painel do vendedor</a>
+                        <a class="btn btn-sm btn-outline-violet d-inline-flex d-md-none" href="{{ route('seller.settings.edit') }}">Painel</a>
                     @endif
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

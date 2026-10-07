@@ -359,6 +359,7 @@ class AsaasPaymentService
             $isPaid = $event === 'PAYMENT_RECEIVED';
             $payment->update([
                 'status' => $isPaid ? 'RECEIVED' : 'CONFIRMED',
+                'fulfillment_status' => $isPaid ? ($payment->fulfillment_status ?? 'payment_received') : $payment->fulfillment_status,
                 'paid_at' => $isPaid ? ($payment->paid_at ?? now()) : $payment->paid_at,
             ]);
 

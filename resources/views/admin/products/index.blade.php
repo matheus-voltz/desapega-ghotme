@@ -5,7 +5,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4 gap-2 flex-wrap">
         <div>
             <h1 class="h3 mb-1">Produtos</h1>
-            <div class="d-flex flex-wrap gap-3 small"><a href="{{ route('admin.shopee.index') }}">Configurar sincronização Shopee →</a><a href="{{ route('seller.settings.edit') }}">Prévia das configurações do vendedor →</a></div>
+            <div class="d-flex flex-wrap gap-3 small"><a href="{{ route('admin.bundles.index') }}">Gerenciar combos →</a><a href="{{ route('admin.shopee.index') }}">Configurar sincronização Shopee →</a><a href="{{ route('seller.settings.edit') }}">Prévia das configurações do vendedor →</a></div>
         </div>
         <a href="{{ route('admin.products.create') }}" class="btn btn-dark">Novo produto</a>
     </div>

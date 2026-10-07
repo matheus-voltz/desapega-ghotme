@@ -7,6 +7,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseClickController;
+use App\Http\Controllers\SavedCatalogController;
 use App\Http\Controllers\Seller\BundleController as SellerBundleController;
 use App\Http\Controllers\Seller\OrderController as SellerOrderController;
 use App\Http\Controllers\Seller\ProductController as SellerProductController;
@@ -32,18 +33,20 @@ Route::view('/itens-proibidos', 'legal.prohibited-items')->name('legal.prohibite
 Route::get('/catalogo', [CatalogController::class, 'index'])->name('catalog.index');
 Route::get('/produto/{product:slug}', [CatalogController::class, 'product'])->name('catalog.product');
 Route::get('/combo/{bundle:slug}', [CatalogController::class, 'bundle'])->name('catalog.bundle');
-Route::get('/comprar/produto/{product:slug}/pix', [PurchaseClickController::class, 'productPix'])->name('purchase.product.pix');
-Route::post('/comprar/produto/{product:slug}/pix', [PurchaseClickController::class, 'createProductPix'])->name('purchase.product.pix.create');
-Route::get('/comprar/produto/{product:slug}/cartao', [PurchaseClickController::class, 'productCard'])->name('purchase.product.card');
-Route::post('/comprar/produto/{product:slug}/cartao', [PurchaseClickController::class, 'createProductCard'])->name('purchase.product.card.create');
+Route::get('/comprar/produto/{product:slug}/pix', [PurchaseClickController::class, 'productPix'])->middleware('auth')->name('purchase.product.pix');
+Route::post('/comprar/produto/{product:slug}/pix', [PurchaseClickController::class, 'createProductPix'])->middleware('auth')->name('purchase.product.pix.create');
+Route::get('/comprar/produto/{product:slug}/cartao', [PurchaseClickController::class, 'productCard'])->middleware('auth')->name('purchase.product.card');
+Route::post('/comprar/produto/{product:slug}/cartao', [PurchaseClickController::class, 'createProductCard'])->middleware('auth')->name('purchase.product.card.create');
 Route::post('/comprar/produto/{product:slug}/shopee', [PurchaseClickController::class, 'productShopee'])->name('purchase.product.shopee');
-Route::get('/comprar/combo/{bundle:slug}/pix', [PurchaseClickController::class, 'bundlePix'])->name('purchase.bundle.pix');
-Route::post('/comprar/combo/{bundle:slug}/pix', [PurchaseClickController::class, 'createBundlePix'])->name('purchase.bundle.pix.create');
+Route::get('/comprar/combo/{bundle:slug}/pix', [PurchaseClickController::class, 'bundlePix'])->middleware('auth')->name('purchase.bundle.pix');
+Route::post('/comprar/combo/{bundle:slug}/pix', [PurchaseClickController::class, 'createBundlePix'])->middleware('auth')->name('purchase.bundle.pix.create');
 Route::get('/pagamento/{asaasPayment:external_reference}/status', [PurchaseClickController::class, 'paymentStatus'])->name('purchase.payment.status');
 Route::post('/webhooks/asaas', AsaasWebhookController::class)->withoutMiddleware([ValidateCsrfToken::class])->name('webhooks.asaas');
 Route::post('/webhooks/shopee', ShopeeWebhookController::class)->withoutMiddleware([ValidateCsrfToken::class])->name('webhooks.shopee');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/meus-catalogos', [SavedCatalogController::class, 'index'])->name('saved-catalogs.index');
+    Route::delete('/meus-catalogos/{savedCatalog}', [SavedCatalogController::class, 'destroy'])->name('saved-catalogs.destroy');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

@@ -55,7 +55,7 @@
                             <button type="submit" class="btn btn-outline-violet btn-lg">Adicionar à sacola</button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" class="btn btn-outline-violet btn-lg">Entrar para adicionar à sacola</a>
+                        <a href="{{ route('purchase.product.pix', $product) }}" class="btn btn-outline-violet btn-lg">Entrar para comprar</a>
                     @endauth
                     @if($sellerUsesAsaas || $sellerHasManualPix)<a href="{{ route('purchase.product.pix', $product) }}" class="btn btn-violet btn-lg">Comprar no Pix</a>@endif
                     @if($product->marketplace_price !== null && $sellerUsesAsaas)

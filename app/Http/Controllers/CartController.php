@@ -52,6 +52,12 @@ class CartController extends Controller
             'Finalize os itens deste vendedor antes de adicionar itens de outro catálogo.'
         );
 
+        if ($product->seller_id !== null) {
+            $request->user()->savedCatalogs()->firstOrCreate([
+                'seller_id' => $product->seller_id,
+            ]);
+        }
+
         $cartItem = $cart->items()->firstOrCreate(['product_id' => $product->id]);
 
         return to_route('cart.index')->with(

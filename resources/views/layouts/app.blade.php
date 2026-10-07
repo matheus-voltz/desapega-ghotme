@@ -23,7 +23,7 @@
                         @elseif(! request()->routeIs('landing'))
                             <a class="nav-link-custom" href="{{ route('catalog.index') }}#catalogo">Catálogo</a>
                         @endif
-                        @if(! auth()->user()->isAdmin() && ! auth()->user()->isSeller())<a class="btn btn-sm btn-outline-violet" href="{{ route('cart.index') }}">Minha sacola</a>@endif
+                        @if(! auth()->user()->isAdmin() && ! auth()->user()->isSeller())<a class="nav-link-custom" href="{{ route('saved-catalogs.index') }}">Meus catálogos</a><a class="btn btn-sm btn-outline-violet" href="{{ route('cart.index') }}">Minha sacola</a>@endif
                         @if(auth()->user()->isAdmin())<a class="nav-link-custom" href="{{ route('admin.products.index') }}">Meu painel</a>@elseif(auth()->user()->isSeller())<a class="nav-link-custom" href="{{ route('seller.products.index') }}">Painel do vendedor</a>@endif
                         <a class="nav-link-custom" href="{{ route('profile.edit') }}">Minha conta</a>
                         <form method="POST" action="{{ route('logout') }}">@csrf<button class="btn btn-sm btn-link text-secondary text-decoration-none" type="submit">Sair</button></form>
@@ -40,7 +40,7 @@
                             @elseif(! request()->routeIs('landing'))
                                 <a href="{{ route('catalog.index') }}#catalogo">Catálogo</a>
                             @endif
-                            @if(! auth()->user()->isAdmin() && ! auth()->user()->isSeller())<a href="{{ route('cart.index') }}">Minha sacola</a>@endif
+                            @if(! auth()->user()->isAdmin() && ! auth()->user()->isSeller())<a href="{{ route('saved-catalogs.index') }}">Meus catálogos</a><a href="{{ route('cart.index') }}">Minha sacola</a>@endif
                             @if(auth()->user()->isAdmin())<a href="{{ route('admin.products.index') }}">Meu painel</a>@elseif(auth()->user()->isSeller())<a href="{{ route('seller.products.index') }}">Painel do vendedor</a><a href="{{ route('seller.settings.edit') }}">Configurações</a>@endif
                             <a href="{{ route('profile.edit') }}">Minha conta</a>
                             <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit">Sair</button></form>

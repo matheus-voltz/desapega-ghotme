@@ -26,6 +26,7 @@ class PurchaseClickController extends Controller
      */
     public function productPix(Request $request, Product $product): View
     {
+        $this->saveCatalog($request, $product->seller_id);
         $product->loadMissing('seller.sellerSetting');
         $payment = $this->paymentForProduct($request, $product);
         abort_unless($payment || $product->status === 'available', 409, 'Este produto não está mais disponível.');
@@ -48,6 +49,7 @@ class PurchaseClickController extends Controller
         Product $product,
         AsaasPaymentService $payments,
     ): RedirectResponse {
+        $this->saveCatalog($request, $product->seller_id);
         abort_if($this->manualPixKey($product) !== null, 422, 'Este vendedor recebe Pix diretamente pela chave informada.');
         try {
             $payment = $payments->createForProduct($product, $request->validated());
@@ -71,6 +73,7 @@ class PurchaseClickController extends Controller
 
     public function productCard(Request $request, Product $product): View
     {
+        $this->saveCatalog($request, $product->seller_id);
         abort_if($product->marketplace_price === null, 404, 'O preço para cartão ainda não foi configurado neste item.');
         $product->loadMissing('seller.sellerSetting');
         abort_if($product->seller_id !== null && ! $product->seller?->sellerSetting?->asaas_api_key, 404, 'Este vendedor ainda não aceita cartão.');
@@ -93,6 +96,7 @@ class PurchaseClickController extends Controller
         Product $product,
         AsaasPaymentService $payments,
     ): RedirectResponse {
+        $this->saveCatalog($request, $product->seller_id);
         abort_if($product->marketplace_price === null, 404, 'O preço para cartão ainda não foi configurado neste item.');
         $product->loadMissing('seller.sellerSetting');
         abort_if($product->seller_id !== null && ! $product->seller?->sellerSetting?->asaas_api_key, 404, 'Este vendedor ainda não aceita cartão.');
@@ -111,6 +115,7 @@ class PurchaseClickController extends Controller
 
     public function bundlePix(Request $request, Bundle $bundle): View
     {
+        $this->saveCatalog($request, $bundle->seller_id);
         $bundle->loadMissing('seller.sellerSetting');
         $payment = $this->paymentForBundle($request, $bundle);
         abort_unless($payment || $bundle->active, 404);
@@ -138,6 +143,7 @@ class PurchaseClickController extends Controller
         Bundle $bundle,
         AsaasPaymentService $payments,
     ): RedirectResponse {
+        $this->saveCatalog($request, $bundle->seller_id);
         abort_if($this->manualPixKey($bundle) !== null, 422, 'Este vendedor recebe Pix diretamente pela chave informada.');
 
         try {
@@ -211,5 +217,16 @@ class PurchaseClickController extends Controller
         $pixKey = trim((string) $product->seller?->sellerSetting?->pix_key);
 
         return $pixKey === '' ? null : $pixKey;
+    }
+
+    private function saveCatalog(Request $request, ?int $sellerId): void
+    {
+        if ($sellerId === null) {
+            return;
+        }
+
+        $request->user()->savedCatalogs()->firstOrCreate([
+            'seller_id' => $sellerId,
+        ]);
     }
 }

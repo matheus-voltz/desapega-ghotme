@@ -22,6 +22,8 @@ class AsaasPaymentFlowTest extends TestCase
         config()->set('asaas.environment', 'sandbox');
         config()->set('asaas.api_key', 'sandbox-key');
         config()->set('asaas.webhook_token', 'a-secure-webhook-token-with-more-than-32-characters');
+
+        $this->actingAs(User::factory()->create());
     }
 
     public function test_it_sends_the_product_price_to_asaas_and_displays_the_dynamic_pix_code(): void

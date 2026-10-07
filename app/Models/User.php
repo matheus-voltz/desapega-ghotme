@@ -71,6 +71,11 @@ class User extends Authenticatable
         return $this->hasMany(AsaasPayment::class, 'seller_id');
     }
 
+    public function savedCatalogs(): HasMany
+    {
+        return $this->hasMany(SavedCatalog::class);
+    }
+
     public function isSeller(): bool
     {
         return $this->account_type === 'seller';

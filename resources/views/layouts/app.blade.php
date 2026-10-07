@@ -33,13 +33,13 @@
                 <details class="site-nav-mobile">
                     <summary aria-label="Abrir menu">☰ <span>Menu</span></summary>
                     <div class="site-nav-menu">
-                        @if(request()->routeIs('landing'))<a href="{{ route('login') }}">Entrar na conta</a>@else<a href="{{ route('catalog.index') }}#catalogo">Catálogo</a>@endif
                         @auth
+                            @unless(request()->routeIs('landing'))<a href="{{ route('catalog.index') }}#catalogo">Catálogo</a>@endunless
                             <a href="{{ route('cart.index') }}">Minha sacola</a>
                             @if(auth()->user()->isAdmin())<a href="{{ route('admin.products.index') }}">Meu painel</a>@elseif(auth()->user()->isSeller())<a href="{{ route('seller.products.index') }}">Painel do vendedor</a><a href="{{ route('seller.settings.edit') }}">Configurações</a>@endif
                             <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit">Sair</button></form>
                         @else
-                            <a class="menu-highlight" href="{{ route('login') }}">Entrar</a>
+                            <a class="menu-highlight" href="{{ route('login') }}">Entrar na conta</a>
                         @endauth
                     </div>
                 </details>
@@ -52,7 +52,6 @@
     <footer class="site-footer mt-5">
         <div class="container py-4 d-flex flex-column flex-sm-row justify-content-between gap-2 small">
             <span>Desapega.ghotme · itens em busca de um novo lar</span>
-            <a href="{{ route('catalog.index') }}">Voltar ao catálogo</a>
         </div>
     </footer>
     @stack('scripts')

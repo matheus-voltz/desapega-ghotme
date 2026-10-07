@@ -15,28 +15,34 @@
     <header class="site-header">
         <div class="container d-flex align-items-center justify-content-between py-3">
             <a class="brand" href="{{ route('landing') }}"><span class="brand-mark">D</span><span>Desapega<span class="brand-muted">.ghotme</span></span></a>
-            <nav class="site-nav d-flex align-items-center gap-2">
-                @if(request()->routeIs('landing'))
-                    <a class="nav-link-custom d-none d-sm-inline" href="{{ route('login') }}">Entrar na conta</a>
-                @else
-                    <a class="nav-link-custom d-none d-sm-inline" href="{{ route('catalog.index') }}#catalogo">Catálogo</a>
-                @endif
-                @auth
-                    <a class="btn btn-sm btn-outline-violet d-none d-sm-inline-flex" href="{{ route('cart.index') }}">Minha sacola</a>
-                    @if(auth()->user()->isAdmin())
-                        <a class="nav-link-custom d-none d-md-inline" href="{{ route('admin.products.index') }}">Meu painel</a>
-                        <a class="btn btn-sm btn-outline-violet d-inline-flex d-md-none" href="{{ route('admin.products.index') }}">Painel</a>
-                    @elseif(auth()->user()->isSeller())
-                        <a class="nav-link-custom d-none d-md-inline" href="{{ route('seller.products.index') }}">Painel do vendedor</a>
-                        <a class="btn btn-sm btn-outline-violet d-inline-flex d-md-none" href="{{ route('seller.products.index') }}">Painel</a>
+            <nav class="site-nav">
+                <div class="site-nav-desktop d-flex align-items-center gap-2">
+                    @if(request()->routeIs('landing'))
+                        <a class="nav-link-custom" href="{{ route('login') }}">Entrar na conta</a>
+                    @else
+                        <a class="nav-link-custom" href="{{ route('catalog.index') }}#catalogo">Catálogo</a>
                     @endif
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button class="btn btn-sm btn-link text-secondary text-decoration-none" type="submit">Sair</button>
-                    </form>
-                @else
-                    <a class="btn btn-sm btn-outline-violet" href="{{ route('login') }}">Entrar</a>
-                @endauth
+                    @auth
+                        <a class="btn btn-sm btn-outline-violet" href="{{ route('cart.index') }}">Minha sacola</a>
+                        @if(auth()->user()->isAdmin())<a class="nav-link-custom" href="{{ route('admin.products.index') }}">Meu painel</a>@elseif(auth()->user()->isSeller())<a class="nav-link-custom" href="{{ route('seller.products.index') }}">Painel do vendedor</a>@endif
+                        <form method="POST" action="{{ route('logout') }}">@csrf<button class="btn btn-sm btn-link text-secondary text-decoration-none" type="submit">Sair</button></form>
+                    @else
+                        <a class="btn btn-sm btn-outline-violet" href="{{ route('login') }}">Entrar</a>
+                    @endauth
+                </div>
+                <details class="site-nav-mobile">
+                    <summary aria-label="Abrir menu">☰ <span>Menu</span></summary>
+                    <div class="site-nav-menu">
+                        @if(request()->routeIs('landing'))<a href="{{ route('login') }}">Entrar na conta</a>@else<a href="{{ route('catalog.index') }}#catalogo">Catálogo</a>@endif
+                        @auth
+                            <a href="{{ route('cart.index') }}">Minha sacola</a>
+                            @if(auth()->user()->isAdmin())<a href="{{ route('admin.products.index') }}">Meu painel</a>@elseif(auth()->user()->isSeller())<a href="{{ route('seller.products.index') }}">Painel do vendedor</a><a href="{{ route('seller.settings.edit') }}">Configurações</a>@endif
+                            <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit">Sair</button></form>
+                        @else
+                            <a class="menu-highlight" href="{{ route('login') }}">Entrar</a>
+                        @endauth
+                    </div>
+                </details>
             </nav>
         </div>
     </header>

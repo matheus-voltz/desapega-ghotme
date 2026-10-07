@@ -13,10 +13,22 @@ class SellerProfileController extends Controller
 
         $products = $seller->products()
             ->where('status', 'available')
+            ->where('is_visible', true)
+            ->with('seller:id,name,public_slug')
             ->orderBy('sort_order')
             ->orderByDesc('id')
             ->paginate(12);
 
-        return view('seller.profile', compact('seller', 'products'));
+        $bundles = $seller->bundles()
+            ->with('products')
+            ->where('active', true)
+            ->has('products')
+            ->whereDoesntHave('products', fn ($productQuery) => $productQuery
+                ->where('status', '!=', 'available')
+                ->orWhere('is_visible', false))
+            ->latest()
+            ->get();
+
+        return view('seller.profile', compact('seller', 'products', 'bundles'));
     }
 }

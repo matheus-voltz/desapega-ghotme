@@ -46,5 +46,11 @@
             @endif
         </div>
     </div>
+    @if($bundle->products->isNotEmpty())
+        <section class="mt-5 pt-4 border-top">
+            <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-4"><div><div class="eyebrow mb-2">Prefere escolher separado?</div><h2 class="section-heading mb-0">Também à venda separadamente</h2></div><span class="small text-secondary">Cada item também pode ser comprado individualmente</span></div>
+            <div class="row g-3 g-lg-4">@include('catalog._product-cards', ['products' => $bundle->products])</div>
+        </section>
+    @endif
 </div>
 @endsection

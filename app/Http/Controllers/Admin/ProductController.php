@@ -113,6 +113,7 @@ class ProductController extends Controller
             'cover_images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:12288'],
             'cover_image_url' => ['nullable', 'url', 'max:2048'],
             'status' => ['required', 'in:available,reserved,sold'],
+            'is_visible' => ['nullable', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
         ], [
             'cover_images.max' => 'Você pode enviar no máximo 4 fotos por item.',

@@ -12,6 +12,7 @@
         <div class="col-12"><div class="small text-secondary mb-2">Fotos atuais</div><div class="d-flex flex-wrap gap-2">@foreach($product->image_urls as $imageUrl)<img src="{{ $imageUrl }}" alt="{{ $product->name }}" class="rounded-3 border" style="width: 112px;height:112px;object-fit:cover">@endforeach</div></div>
     @endif
     <div class="col-12"><label class="form-label" for="description">Descrição</label><textarea id="description" name="description" rows="6" class="form-control" placeholder="Conte detalhes, conservação e o que acompanha o item.">{{ old('description', $product?->description) }}</textarea></div>
+    <div class="col-12"><input type="hidden" name="is_visible" value="0"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_visible" value="1" id="is_visible" @checked(old('is_visible', $product?->is_visible ?? true))><label class="form-check-label" for="is_visible"><strong>Exibir este item no meu catálogo</strong><span class="d-block small text-secondary">Desmarque para ocultar o item sem apagar o anúncio.</span></label></div></div>
 </div>
 @if($errors->any())<div class="alert alert-danger mt-3"><ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
 <div class="mt-4 d-flex flex-wrap gap-2"><button class="btn btn-violet">Salvar item</button><a href="{{ route('seller.products.index') }}" class="btn btn-outline-violet">Cancelar</a></div>

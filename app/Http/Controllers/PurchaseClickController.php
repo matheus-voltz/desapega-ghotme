@@ -111,6 +111,7 @@ class PurchaseClickController extends Controller
 
     public function bundlePix(Request $request, Bundle $bundle): View
     {
+        $bundle->loadMissing('seller.sellerSetting');
         $payment = $this->paymentForBundle($request, $bundle);
         abort_unless($payment || $bundle->active, 404);
 
@@ -127,6 +128,7 @@ class PurchaseClickController extends Controller
             'backUrl' => route('catalog.bundle', $bundle),
             'products' => $bundle->products,
             'payment' => $payment,
+            'manualPixKey' => $this->manualPixKey($bundle),
             'createPaymentUrl' => route('purchase.bundle.pix.create', $bundle),
         ]);
     }
@@ -136,6 +138,8 @@ class PurchaseClickController extends Controller
         Bundle $bundle,
         AsaasPaymentService $payments,
     ): RedirectResponse {
+        abort_if($this->manualPixKey($bundle) !== null, 422, 'Este vendedor recebe Pix diretamente pela chave informada.');
+
         try {
             $payment = $payments->createForBundle($bundle, $request->validated());
         } catch (RuntimeException $exception) {
@@ -198,7 +202,7 @@ class PurchaseClickController extends Controller
             ->firstOrFail();
     }
 
-    private function manualPixKey(Product $product): ?string
+    private function manualPixKey(Product|Bundle $product): ?string
     {
         if ($product->seller_id === null || $product->seller?->sellerSetting?->asaas_api_key) {
             return null;

@@ -36,6 +36,9 @@ class ProductController extends Controller
         $data['slug'] = $this->uniqueSlug($data['name']);
         $data['seller_id'] = $request->user()->id;
         $data['status'] = 'available';
+        $data['is_visible'] = $request->has('is_visible')
+            ? $request->boolean('is_visible')
+            : true;
 
         if ($images !== []) {
             $data['cover_image_path'] = $this->storeImages($images);
@@ -60,6 +63,9 @@ class ProductController extends Controller
         $data = $this->validated($request);
         $images = $data['cover_images'] ?? [];
         unset($data['cover_images']);
+        if ($request->has('is_visible')) {
+            $data['is_visible'] = $request->boolean('is_visible');
+        }
 
         if ($product->name !== $data['name']) {
             $data['slug'] = $this->uniqueSlug($data['name'], $product->id);
@@ -100,6 +106,7 @@ class ProductController extends Controller
             'cover_images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:12288'],
             'cover_image_url' => ['nullable', 'url', 'max:2048'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
+            'is_visible' => ['nullable', 'boolean'],
         ], [
             'cover_images.max' => 'Você pode enviar no máximo 4 fotos por item.',
             'cover_images.*.image' => 'Cada foto deve ser uma imagem válida em JPG, PNG ou WebP.',

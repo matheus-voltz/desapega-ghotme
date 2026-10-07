@@ -30,6 +30,7 @@ class Product extends Model
         'cover_image_path',
         'cover_image_url',
         'status',
+        'is_visible',
         'shopee_order_sn',
         'shopee_order_status',
         'sale_channel',
@@ -41,6 +42,7 @@ class Product extends Model
         'pix_price' => 'decimal:2',
         'marketplace_price' => 'decimal:2',
         'shopee_synced_at' => 'datetime',
+        'is_visible' => 'boolean',
     ];
 
     public function bundles(): BelongsToMany

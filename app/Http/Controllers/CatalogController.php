@@ -14,6 +14,7 @@ class CatalogController extends Controller
     {
         $query = Product::query()
             ->where('status', 'available')
+            ->where('is_visible', true)
             ->with('seller:id,name,public_slug')
             ->orderBy('sort_order')
             ->orderByDesc('id');
@@ -48,7 +49,9 @@ class CatalogController extends Controller
             ->with('products')
             ->where('active', true)
             ->has('products')
-            ->whereDoesntHave('products', fn ($productQuery) => $productQuery->where('status', '!=', 'available'))
+            ->whereDoesntHave('products', fn ($productQuery) => $productQuery
+                ->where('status', '!=', 'available')
+                ->orWhere('is_visible', false))
             ->orderByDesc('id')
             ->get();
 
@@ -64,6 +67,10 @@ class CatalogController extends Controller
 
     public function product(Product $product)
     {
+        abort_unless(
+            $product->is_visible || auth()->id() === $product->seller_id || auth()->user()?->isAdmin(),
+            404,
+        );
         $product->load('seller.sellerSetting');
 
         return view('catalog.product', compact('product'));
@@ -72,7 +79,7 @@ class CatalogController extends Controller
     public function bundle(Bundle $bundle)
     {
         abort_unless($bundle->active, 404);
-        $bundle->load('products');
+        $bundle->load('products.seller');
 
         return view('catalog.bundle', compact('bundle'));
     }

@@ -37,6 +37,7 @@
             @endforeach
         </select>
     </div>
+    <div class="col-md-4 d-flex align-items-end"><input type="hidden" name="is_visible" value="0"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="is_visible" value="1" id="is_visible" @checked(old('is_visible', $product?->is_visible ?? true))><label class="form-check-label" for="is_visible">Exibir no catálogo</label></div></div>
 
     <div class="col-12"><hr><h2 class="h6">Sincronização Shopee</h2></div>
     <div class="col-md-6">

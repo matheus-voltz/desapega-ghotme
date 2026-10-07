@@ -103,7 +103,7 @@ class AsaasPaymentService
                     ->lockForUpdate()
                     ->get();
 
-                if ($products->count() !== $cartItems->count() || $products->contains(fn (Product $product): bool => $product->status !== 'available')) {
+                if ($products->count() !== $cartItems->count() || $products->contains(fn (Product $product): bool => $product->status !== 'available' || ! $product->is_visible)) {
                     throw new RuntimeException('Um ou mais itens da sua sacola não estão mais disponíveis.');
                 }
 
@@ -126,7 +126,7 @@ class AsaasPaymentService
             $lockedTarget = Bundle::query()->lockForUpdate()->findOrFail($target->id);
             $products = $lockedTarget->products()->lockForUpdate()->get();
 
-            if (! $lockedTarget->active || $products->contains(fn (Product $product): bool => $product->status !== 'available')) {
+            if (! $lockedTarget->active || $products->contains(fn (Product $product): bool => $product->status !== 'available' || ! $product->is_visible)) {
                 throw new RuntimeException('Um ou mais itens deste combo não estão mais disponíveis.');
             }
 
@@ -137,6 +137,7 @@ class AsaasPaymentService
 
             return AsaasPayment::create([
                 'bundle_id' => $lockedTarget->id,
+                'seller_id' => $lockedTarget->seller_id,
                 'external_reference' => (string) Str::uuid(),
                 'amount' => $lockedTarget->pix_price,
                 'status' => 'CREATING',
@@ -219,7 +220,7 @@ class AsaasPaymentService
                     ->lockForUpdate()
                     ->get();
 
-                if ($products->count() !== $cartItems->count() || $products->contains(fn (Product $product): bool => $product->status !== 'available')) {
+                if ($products->count() !== $cartItems->count() || $products->contains(fn (Product $product): bool => $product->status !== 'available' || ! $product->is_visible)) {
                     throw new RuntimeException('Um ou mais itens da sua sacola não estão mais disponíveis.');
                 }
 
@@ -509,7 +510,7 @@ class AsaasPaymentService
 
     private function ensureProductIsAvailable(Product $product): void
     {
-        if ($product->status !== 'available') {
+        if ($product->status !== 'available' || ! $product->is_visible) {
             throw new RuntimeException('Este produto não está mais disponível.');
         }
     }

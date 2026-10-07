@@ -7,6 +7,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseClickController;
+use App\Http\Controllers\Seller\BundleController as SellerBundleController;
 use App\Http\Controllers\Seller\OrderController as SellerOrderController;
 use App\Http\Controllers\Seller\ProductController as SellerProductController;
 use App\Http\Controllers\Seller\SettingsController;
@@ -70,6 +71,10 @@ Route::middleware(['auth', 'seller'])->prefix('vendedor')->name('seller.')->grou
     Route::resource('itens', SellerProductController::class)
         ->parameters(['itens' => 'product'])
         ->names('products')
+        ->except('show');
+    Route::resource('combos', SellerBundleController::class)
+        ->parameters(['combos' => 'bundle'])
+        ->names('bundles')
         ->except('show');
     Route::get('/pedidos', [SellerOrderController::class, 'index'])->name('orders.index');
     Route::put('/pedidos/{order}', [SellerOrderController::class, 'update'])->name('orders.update');

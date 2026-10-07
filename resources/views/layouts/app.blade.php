@@ -11,7 +11,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/desapego.css') }}">
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     <header class="site-header">
         <div class="container d-flex align-items-center justify-content-between py-3">
             <a class="brand" href="{{ route('landing') }}"><span class="brand-mark">D</span><span>Desapega<span class="brand-muted">.ghotme</span></span></a>
@@ -51,9 +51,9 @@
         </div>
     </header>
 
-    <main>@yield('content')</main>
+    <main class="flex-grow-1">@yield('content')</main>
 
-    <footer class="site-footer mt-5">
+    <footer class="site-footer mt-auto">
         <div class="container py-4 d-flex flex-column flex-sm-row justify-content-between gap-2 small">
             <span>Desapega.ghotme · itens em busca de um novo lar</span>
             <span class="d-flex flex-wrap gap-3"><a href="{{ route('legal.terms') }}">Termos</a><a href="{{ route('legal.privacy') }}">Privacidade</a><a href="{{ route('legal.prohibited-items') }}">Itens proibidos</a></span>

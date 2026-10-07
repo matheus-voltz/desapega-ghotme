@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bundle;
-use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -18,9 +17,9 @@ class BundleController extends Controller
         return view('admin.bundles.index', compact('bundles'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $products = Product::orderBy('name')->get();
+        $products = $request->user()->products()->orderBy('name')->get();
 
         return view('admin.bundles.create', compact('products'));
     }
@@ -30,7 +29,9 @@ class BundleController extends Controller
         $data = $this->validated($request);
         $productIds = $data['products'];
         unset($data['products']);
+        $this->ensureProductsAreOwnedByUser($request, $productIds);
         $data['slug'] = $this->uniqueSlug($data['name']);
+        $data['seller_id'] = $request->user()->id;
         $data['active'] = $request->boolean('active');
 
         if ($request->hasFile('cover_image')) {
@@ -45,7 +46,8 @@ class BundleController extends Controller
 
     public function edit(Bundle $bundle)
     {
-        $products = Product::orderBy('name')->get();
+        abort_unless($bundle->seller_id === auth()->id(), 404);
+        $products = auth()->user()->products()->orderBy('name')->get();
         $bundle->load('products');
 
         return view('admin.bundles.edit', compact('bundle', 'products'));
@@ -56,6 +58,7 @@ class BundleController extends Controller
         $data = $this->validated($request);
         $productIds = $data['products'];
         unset($data['products']);
+        $this->ensureProductsAreOwnedByUser($request, $productIds);
         $data['active'] = $request->boolean('active');
 
         if ($bundle->name !== $data['name']) {
@@ -77,6 +80,7 @@ class BundleController extends Controller
 
     public function destroy(Bundle $bundle)
     {
+        abort_unless($bundle->seller_id === auth()->id(), 404);
         if ($bundle->cover_image_path) {
             Storage::disk('public')->delete($bundle->cover_image_path);
         }
@@ -110,5 +114,17 @@ class BundleController extends Controller
         }
 
         return $slug;
+    }
+
+    /**
+     * @param  array<int, int|string>  $productIds
+     */
+    private function ensureProductsAreOwnedByUser(Request $request, array $productIds): void
+    {
+        abort_unless(
+            $request->user()->products()->whereIn('id', $productIds)->count() === count($productIds),
+            422,
+            'Selecione apenas itens do seu próprio catálogo.',
+        );
     }
 }

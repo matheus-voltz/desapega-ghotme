@@ -60,6 +60,11 @@ class User extends Authenticatable
         return $this->hasMany(Product::class, 'seller_id');
     }
 
+    public function bundles(): HasMany
+    {
+        return $this->hasMany(Bundle::class, 'seller_id');
+    }
+
     public function sales(): HasMany
     {
         return $this->hasMany(AsaasPayment::class, 'seller_id');

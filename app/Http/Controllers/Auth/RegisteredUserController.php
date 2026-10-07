@@ -35,6 +35,7 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'account_type' => ['required', 'in:buyer,seller'],
+            'accept_legal' => ['accepted'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -43,6 +44,8 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'account_type' => $request->account_type,
             'public_slug' => Str::slug($request->name).'-'.Str::lower(Str::random(5)),
+            'terms_accepted_at' => now(),
+            'privacy_accepted_at' => now(),
             'password' => Hash::make($request->password),
         ]);
 

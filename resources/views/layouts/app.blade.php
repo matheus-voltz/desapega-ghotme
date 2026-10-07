@@ -52,6 +52,7 @@
     <footer class="site-footer mt-5">
         <div class="container py-4 d-flex flex-column flex-sm-row justify-content-between gap-2 small">
             <span>Desapega.ghotme · itens em busca de um novo lar</span>
+            <span class="d-flex flex-wrap gap-3"><a href="{{ route('legal.terms') }}">Termos</a><a href="{{ route('legal.privacy') }}">Privacidade</a><a href="{{ route('legal.prohibited-items') }}">Itens proibidos</a></span>
         </div>
     </footer>
     @stack('scripts')

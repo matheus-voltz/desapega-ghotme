@@ -25,6 +25,9 @@ Route::get('/dashboard', function (Request $request): RedirectResponse {
     ->name('dashboard');
 
 Route::view('/', 'landing')->name('landing');
+Route::view('/termos-de-uso', 'legal.terms')->name('legal.terms');
+Route::view('/politica-de-privacidade', 'legal.privacy')->name('legal.privacy');
+Route::view('/itens-proibidos', 'legal.prohibited-items')->name('legal.prohibited-items');
 Route::get('/catalogo', [CatalogController::class, 'index'])->name('catalog.index');
 Route::get('/produto/{product:slug}', [CatalogController::class, 'product'])->name('catalog.product');
 Route::get('/combo/{bundle:slug}', [CatalogController::class, 'bundle'])->name('catalog.bundle');

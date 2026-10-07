@@ -49,10 +49,10 @@ class CatalogPaginationTest extends TestCase
 
     public function test_catalog_filters_available_items_by_search_and_maximum_pix_price(): void
     {
-        Product::factory()->create(['name' => 'Livro de fantasia', 'pix_price' => 40]);
-        Product::factory()->create(['name' => 'Livro raro', 'pix_price' => 180]);
-        Product::factory()->create(['name' => 'Console portátil', 'pix_price' => 40]);
-        Product::factory()->create(['name' => 'Livro indisponível', 'pix_price' => 20, 'status' => 'sold']);
+        Product::factory()->create(['name' => 'Livro de fantasia', 'description' => 'Aventura', 'pix_price' => 40]);
+        Product::factory()->create(['name' => 'Livro raro', 'description' => 'Colecionável', 'pix_price' => 180]);
+        Product::factory()->create(['name' => 'Console portátil', 'description' => 'Jogo eletrônico', 'pix_price' => 40]);
+        Product::factory()->create(['name' => 'Livro indisponível', 'description' => 'Fora de estoque', 'pix_price' => 20, 'status' => 'sold']);
 
         $this->get(route('catalog.index', ['search' => 'Livro', 'max_price' => 100]))
             ->assertOk()

@@ -26,4 +26,14 @@ class SellerSettingsTest extends TestCase
         $this->assertDatabaseMissing('seller_settings', ['asaas_api_key' => 'asaas-secret']);
         $this->assertSame('asaas-secret', $seller->fresh()->sellerSetting->asaas_api_key);
     }
+
+    public function test_administrator_can_preview_seller_settings(): void
+    {
+        $administrator = User::factory()->administrator()->create();
+
+        $this->actingAs($administrator)
+            ->get(route('seller.settings.edit'))
+            ->assertOk()
+            ->assertSee('Prévia administrativa');
+    }
 }

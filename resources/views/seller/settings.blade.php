@@ -4,9 +4,10 @@
 
 @section('content')
 <div class="container py-5" style="max-width: 900px">
-    <div class="mb-4"><div class="eyebrow mb-2">Painel do vendedor</div><h1 class="h2 fw-bold mb-2">Configurações da conta</h1><p class="text-secondary">As credenciais ficam criptografadas e não são exibidas depois de salvas.</p></div>
+    <div class="mb-4"><div class="eyebrow mb-2">{{ $isPreview ? 'Prévia administrativa' : 'Painel do vendedor' }}</div><h1 class="h2 fw-bold mb-2">Configurações da conta</h1><p class="text-secondary">As credenciais ficam criptografadas e não são exibidas depois de salvas.</p></div>
+    @if($isPreview)<div class="alert alert-info">Você está vendo a prévia do painel de vendedor. O link público aparece apenas para contas cadastradas como vendedor.</div>@endif
     @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
-    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4"><h2 class="h5 fw-bold">Seu link público</h2><p class="text-secondary small">Compartilhe este endereço no WhatsApp, Instagram ou onde quiser para mostrar seus itens disponíveis.</p><div class="input-group"><input class="form-control" value="{{ $shareUrl }}" readonly><button type="button" class="btn btn-outline-violet" data-copy-link="{{ $shareUrl }}">Copiar</button></div><div class="d-flex flex-wrap gap-2 mt-3"><button type="button" class="btn btn-violet" data-share-link="{{ $shareUrl }}">Compartilhar catálogo</button><a class="btn btn-outline-violet" href="{{ $shareUrl }}" target="_blank">Ver meu catálogo</a></div></div>
+    @if($shareUrl)<div class="card border-0 shadow-sm rounded-4 p-4 mb-4"><h2 class="h5 fw-bold">Seu link público</h2><p class="text-secondary small">Compartilhe este endereço no WhatsApp, Instagram ou onde quiser para mostrar seus itens disponíveis.</p><div class="input-group"><input class="form-control" value="{{ $shareUrl }}" readonly><button type="button" class="btn btn-outline-violet" data-copy-link="{{ $shareUrl }}">Copiar</button></div><div class="d-flex flex-wrap gap-2 mt-3"><button type="button" class="btn btn-violet" data-share-link="{{ $shareUrl }}">Compartilhar catálogo</button><a class="btn btn-outline-violet" href="{{ $shareUrl }}" target="_blank">Ver meu catálogo</a></div></div>@endif
     <form method="POST" action="{{ route('seller.settings.update') }}" class="card border-0 shadow-sm rounded-4 p-4">
         @csrf @method('PUT')
         <h2 class="h5 fw-bold">Asaas</h2><p class="small text-secondary">Use as credenciais da sua própria conta Asaas.</p>

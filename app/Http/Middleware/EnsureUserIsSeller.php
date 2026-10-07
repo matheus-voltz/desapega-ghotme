@@ -15,7 +15,7 @@ class EnsureUserIsSeller
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user()?->isSeller()) {
+        if (! $request->user()?->isSeller() && ! $request->user()?->isAdmin()) {
             return redirect()->route('cart.index');
         }
 

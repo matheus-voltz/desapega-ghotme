@@ -25,10 +25,6 @@
         <input name="marketplace_price" type="number" step="0.01" class="form-control" value="{{ old('marketplace_price', $product?->marketplace_price) }}">
         <div class="form-text">Valor-base exibido no pagamento por cartão. A taxa de parcelamento é calculada no checkout.</div>
     </div>
-    <div class="col-md-8">
-        <label class="form-label">Link Shopee</label>
-        <input name="marketplace_url" type="url" class="form-control" value="{{ old('marketplace_url', $product?->marketplace_url) }}">
-    </div>
     <div class="col-md-4">
         <label class="form-label">Status</label>
         <select name="status" class="form-select">
@@ -38,30 +34,6 @@
         </select>
     </div>
     <div class="col-md-4 d-flex align-items-end"><input type="hidden" name="is_visible" value="0"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="is_visible" value="1" id="is_visible" @checked(old('is_visible', $product?->is_visible ?? true))><label class="form-check-label" for="is_visible">Exibir no catálogo</label></div></div>
-
-    <div class="col-12"><hr><h2 class="h6">Sincronização Shopee</h2></div>
-    <div class="col-md-6">
-        <label class="form-label">Shopee Item ID</label>
-        <input name="shopee_item_id" inputmode="numeric" class="form-control" value="{{ old('shopee_item_id', $product?->shopee_item_id) }}" placeholder="Ex.: 12345678901">
-        <div class="form-text">Identifica o anúncio. É o campo usado para relacionar o item comprado na Shopee com este produto.</div>
-    </div>
-    <div class="col-md-6">
-        <label class="form-label">Shopee Model ID <span class="text-secondary">(opcional)</span></label>
-        <input name="shopee_model_id" inputmode="numeric" class="form-control" value="{{ old('shopee_model_id', $product?->shopee_model_id) }}" placeholder="Use apenas se o anúncio tiver variações">
-        <div class="form-text">Se não houver variação, deixe vazio.</div>
-    </div>
-
-    @if($product?->shopee_order_sn)
-        <div class="col-12">
-            <div class="alert alert-light border mb-0">
-                <strong>Último pedido Shopee:</strong> {{ $product->shopee_order_sn }} ·
-                <strong>Status:</strong> {{ $product->shopee_order_status ?? '—' }}
-                @if($product->shopee_synced_at)
-                    · sincronizado em {{ $product->shopee_synced_at->format('d/m/Y H:i') }}
-                @endif
-            </div>
-        </div>
-    @endif
 
     <div class="col-md-4">
         <label class="form-label">Ordem</label>

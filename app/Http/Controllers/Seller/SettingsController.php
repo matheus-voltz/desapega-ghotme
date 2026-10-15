@@ -28,9 +28,6 @@ class SettingsController extends Controller
             'pix_key' => ['nullable', 'string', 'max:300'],
             'telegram_bot_token' => ['nullable', 'string', 'max:500'],
             'telegram_chat_id' => ['nullable', 'string', 'max:100'],
-            'shopee_partner_id' => ['nullable', 'string', 'max:100'],
-            'shopee_partner_key' => ['nullable', 'string', 'max:500'],
-            'shopee_shop_id' => ['nullable', 'string', 'max:100'],
         ]);
 
         $data = array_filter($data, fn (?string $value): bool => $value !== null && trim($value) !== '');

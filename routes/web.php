@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Admin\BundleController as AdminBundleController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
-use App\Http\Controllers\Admin\ShopeeController as AdminShopeeController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\ProfileController;
@@ -14,7 +13,6 @@ use App\Http\Controllers\Seller\ProductController as SellerProductController;
 use App\Http\Controllers\Seller\SettingsController;
 use App\Http\Controllers\SellerProfileController;
 use App\Http\Controllers\Webhooks\AsaasWebhookController;
-use App\Http\Controllers\Webhooks\ShopeeWebhookController;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -37,12 +35,10 @@ Route::get('/comprar/produto/{product:slug}/pix', [PurchaseClickController::clas
 Route::post('/comprar/produto/{product:slug}/pix', [PurchaseClickController::class, 'createProductPix'])->middleware('auth')->name('purchase.product.pix.create');
 Route::get('/comprar/produto/{product:slug}/cartao', [PurchaseClickController::class, 'productCard'])->middleware('auth')->name('purchase.product.card');
 Route::post('/comprar/produto/{product:slug}/cartao', [PurchaseClickController::class, 'createProductCard'])->middleware('auth')->name('purchase.product.card.create');
-Route::post('/comprar/produto/{product:slug}/shopee', [PurchaseClickController::class, 'productShopee'])->name('purchase.product.shopee');
 Route::get('/comprar/combo/{bundle:slug}/pix', [PurchaseClickController::class, 'bundlePix'])->middleware('auth')->name('purchase.bundle.pix');
 Route::post('/comprar/combo/{bundle:slug}/pix', [PurchaseClickController::class, 'createBundlePix'])->middleware('auth')->name('purchase.bundle.pix.create');
 Route::get('/pagamento/{asaasPayment:external_reference}/status', [PurchaseClickController::class, 'paymentStatus'])->name('purchase.payment.status');
 Route::post('/webhooks/asaas', AsaasWebhookController::class)->withoutMiddleware([ValidateCsrfToken::class])->name('webhooks.asaas');
-Route::post('/webhooks/shopee', ShopeeWebhookController::class)->withoutMiddleware([ValidateCsrfToken::class])->name('webhooks.shopee');
 
 Route::middleware('auth')->group(function () {
     Route::get('/meus-catalogos', [SavedCatalogController::class, 'index'])->name('saved-catalogs.index');
@@ -63,12 +59,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('products/{product}/visibilidade', [AdminProductController::class, 'updateVisibility'])->name('products.visibility');
     Route::resource('products', AdminProductController::class)->except('show');
     Route::resource('bundles', AdminBundleController::class)->except('show');
-    Route::get('shopee', [AdminShopeeController::class, 'index'])->name('shopee.index');
-    Route::get('shopee/connect', [AdminShopeeController::class, 'connect'])->name('shopee.connect');
-    Route::get('shopee/callback', [AdminShopeeController::class, 'callback'])->name('shopee.callback');
-    Route::post('shopee/configure-push', [AdminShopeeController::class, 'configurePush'])->name('shopee.configure-push');
-    Route::post('shopee/sync', [AdminShopeeController::class, 'sync'])->name('shopee.sync');
-    Route::delete('shopee/disconnect', [AdminShopeeController::class, 'disconnect'])->name('shopee.disconnect');
 });
 
 Route::middleware(['auth', 'seller'])->prefix('vendedor')->name('seller.')->group(function () {

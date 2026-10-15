@@ -24,24 +24,17 @@ class Product extends Model
         'description',
         'pix_price',
         'marketplace_price',
-        'marketplace_url',
-        'shopee_item_id',
-        'shopee_model_id',
         'cover_image_path',
         'cover_image_url',
         'status',
         'is_visible',
-        'shopee_order_sn',
-        'shopee_order_status',
         'sale_channel',
-        'shopee_synced_at',
         'sort_order',
     ];
 
     protected $casts = [
         'pix_price' => 'decimal:2',
         'marketplace_price' => 'decimal:2',
-        'shopee_synced_at' => 'datetime',
         'is_visible' => 'boolean',
     ];
 

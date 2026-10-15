@@ -63,14 +63,6 @@ class PurchaseClickController extends Controller
         ]);
     }
 
-    public function productShopee(Product $product): RedirectResponse
-    {
-        abort_unless($product->status === 'available', 409, 'Este produto não está mais disponível.');
-        abort_if(! $product->marketplace_url, 404, 'Link da Shopee não configurado.');
-
-        return redirect()->away($product->marketplace_url);
-    }
-
     public function productCard(Request $request, Product $product): View
     {
         $this->saveCatalog($request, $product->seller_id);

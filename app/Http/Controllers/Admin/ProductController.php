@@ -63,11 +63,9 @@ class ProductController extends Controller
             $data['slug'] = $this->uniqueSlug($data['name'], $product->id);
         }
 
-        // Se você altera o status pelo painel, essa decisão passa a prevalecer sobre eventos antigos da Shopee.
+        // Alterar o status pelo painel define o canal de venda como manual.
         if ($product->status !== $data['status']) {
             $data['sale_channel'] = $data['status'] === 'available' ? null : 'manual';
-            $data['shopee_order_sn'] = null;
-            $data['shopee_order_status'] = null;
         }
 
         if ($images !== []) {
@@ -122,9 +120,6 @@ class ProductController extends Controller
             'description' => ['nullable', 'string'],
             'pix_price' => ['required', 'numeric', 'min:0'],
             'marketplace_price' => ['nullable', 'numeric', 'min:0'],
-            'marketplace_url' => ['nullable', 'url', 'max:1000'],
-            'shopee_item_id' => ['nullable', 'regex:/^\d+$/', 'max:32'],
-            'shopee_model_id' => ['nullable', 'regex:/^\d+$/', 'max:32'],
             'cover_images' => ['nullable', 'array', 'max:4'],
             'cover_images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:12288'],
             'cover_image_url' => ['nullable', 'url', 'max:2048'],

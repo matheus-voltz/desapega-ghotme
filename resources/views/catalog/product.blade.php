@@ -61,12 +61,6 @@
                     @if($product->marketplace_price !== null && $sellerUsesAsaas)
                         <a href="{{ route('purchase.product.card', $product) }}" class="btn btn-outline-violet btn-lg">Pagar com cartão em até 12x</a>
                     @endif
-                    @if($product->marketplace_url)
-                        <form method="POST" action="{{ route('purchase.product.shopee', $product) }}" target="_blank" class="d-grid">
-                            @csrf
-                            <button type="submit" class="btn btn-outline-violet btn-lg">Comprar pela Shopee</button>
-                        </form>
-                    @endif
                 </div>
                 <div class="small text-secondary mt-2">Adicione outros itens à sacola ou compre este item agora pelo Pix.</div>
             @else

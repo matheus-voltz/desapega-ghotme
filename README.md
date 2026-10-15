@@ -1,6 +1,43 @@
-# Desapego Canadá — Starter Laravel
+# Desapega.ghotme — Catálogo de desapego
 
-Catálogo simples para vender itens antes da mudança para o Canadá, com Pix via QR Code do Asaas e cartão.
+Catálogo para vender itens usados antes de uma mudança, com Pix via QR Code do Asaas e cartão. Cada vendedor tem seu próprio catálogo, com itens, combos e uma página pública.
+
+## Capturas de tela
+
+| Catálogo | Produto |
+|---|---|
+| ![Catálogo](docs/screenshots/catalogo.png) | ![Produto](docs/screenshots/produto.png) |
+
+| Combo | Sacola |
+|---|---|
+| ![Combo](docs/screenshots/combo.png) | ![Sacola](docs/screenshots/sacola.png) |
+
+| Login | Meus catálogos |
+|---|---|
+| ![Login](docs/screenshots/login.png) | ![Meus catálogos](docs/screenshots/meus-catalogos.png) |
+
+### Painel do vendedor
+
+| Itens | Combos |
+|---|---|
+| ![Itens](docs/screenshots/vendedor-itens.png) | ![Combos](docs/screenshots/vendedor-combos.png) |
+
+| Pedidos | Configurações |
+|---|---|
+| ![Pedidos](docs/screenshots/vendedor-pedidos.png) | ![Configurações](docs/screenshots/vendedor-configuracoes.png) |
+
+### Página pública da loja
+
+![Loja](docs/screenshots/vendedor-loja.png)
+
+As capturas usam dados de demonstração (`DesapegoDemoSeeder`), com preços e itens fictícios.
+
+## Rodando localmente com dados de demonstração
+
+```bash
+php artisan migrate
+php artisan db:seed --class=DesapegoDemoSeeder
+```
 
 ## O que já vem pronto
 
